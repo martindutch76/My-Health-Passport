@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLK-581 key builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EDF2F0;
+    --surface: #FBFCFB;
+    --ink: #1E2A27;
+    --muted: #5B6B67;
+    --line: #C6D1CD;
+    --line-soft: #DCE4E1;
+    --teal: #1B6E68;
+    --teal-dark: #144F4B;
+    --amber: #C07A22;
+    --amber-soft: #F2DFC0;
+    --err: #A6402F;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  /* Site header */
+  .site-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .site-header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-icon {
+    width: 54px;
+    height: 54px;
+    flex: none;
+  }
+
+  .brand-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--line);
+    flex: none;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .brand-name .line1 { color: var(--ink); display: block; }
+  .brand-name .line2 { color: var(--teal); display: block; }
+
+  .brand-tagline {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .brand-tagline .accent { color: var(--teal); font-weight: 600; }
+
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-left: auto;
+    font-size: 15px;
+  }
+
+  .site-nav a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .site-nav a:hover { color: var(--teal-dark); }
+
+  .site-nav .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex: none;
+  }
+
+  .cta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--teal);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .cta-pill:hover { background: var(--teal-dark); }
+  .cta-pill svg { width: 16px; height: 16px; }
+
+  @media (max-width: 900px) {
+    .site-nav { display: none; }
+  }
+  @media (max-width: 620px) {
+    .brand-tagline { display: none; }
+    .site-header-inner { padding: 14px 16px; }
+    .cta-pill span.full { display: none; }
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 860px) {
+    .layout { grid-template-columns: 340px 1fr; align-items: start; }
+    .result-panel { position: sticky; top: 32px; }
+  }
+
+  .form-intro {
+    max-width: 640px;
+    margin-bottom: 36px;
+  }
+
+  .section-eyebrow {
+    margin: 0 0 14px;
+    color: var(--teal-dark);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: clamp(28px, 4vw, 38px);
+    line-height: 1.08;
+    letter-spacing: -.03em;
+    font-weight: 750;
+    color: var(--ink);
+  }
+
+  .section-accent {
+    width: 56px;
+    height: 4px;
+    margin: 22px 0;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+
+  .section-lede {
+    margin: 0;
+    max-width: 58ch;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+
+  fieldset {
+    border: 0;
+    margin: 0 0 20px;
+    padding: 0;
+  }
+  fieldset:last-of-type { margin-bottom: 0; }
+
+  legend {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 0 0 4px;
+  }
+
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+  input[type="text"]:focus, select:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal);
+  }
+  input[type="text"]:last-child, select:last-child { margin-bottom: 0; }
+
+  .required-mark {
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  .required-note {
+    font-style: italic;
+    font-size: 12px;
+    color: var(--muted);
+    margin: -12px 0 16px;
+  }
+  .required-note .required-mark { margin-right: 3px; }
+
+  .dob-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.3fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .dob-row select, .dob-row input[type="text"] { margin-bottom: 0; }
+  .dob-row .required-note { margin: 6px 0 0; }
+
+  /* Result panel */
+  .result-panel h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-dark);
+    margin: 0 0 18px;
+  }
+
+  .key-strip {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .key-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .key-boxes {
+    display: flex;
+    gap: 3px;
+  }
+
+  .key-box {
+    width: 26px;
+    height: 40px;
+    border: 1.5px solid var(--line);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 17px;
+    font-weight: 600;
+    background: #fff;
+    color: var(--ink);
+  }
+  .key-box.empty { color: var(--line); border-style: dashed; font-weight: 400; }
+  .key-box.filled { border-color: var(--teal); background: #F1F7F6; }
+
+  .key-label {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .full-key-row {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .full-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    word-break: break-all;
+  }
+  .full-key .dim { color: var(--line); }
+
+  button.copy {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--teal);
+    border: none;
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    cursor: pointer;
+  }
+  button.copy:hover { background: var(--teal-dark); }
+  button.copy:active { transform: translateY(1px); }
+  button.copy[disabled] { background: var(--line); cursor: default; }
+
+  .status {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 10px;
+    min-height: 18px;
+  }
+  .status.ok { color: var(--teal-dark); }
+
+  .checks {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .checks label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+    color: var(--muted);
+  }
+  .checks input[type="checkbox"] { margin: 0; }
+
+  .privacy-note {
+    margin-top: 32px;
+    font-size: 13px;
+    color: var(--muted);
+    background: #E4EDE9;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    max-width: 640px;
+  }
+  .privacy-note strong { color: var(--ink); }
+
+  /* ---- My Health Passport hero (scoped) ---- */
+  .mhp-hero {
+    --navy: #17305f;
+    --teal: #148f8b;
+    --teal-dark: #0d7774;
+    --mint: #eaf7f6;
+    --text: #17305f;
+    --muted: #52627d;
+    --border: #e5ebf1;
+    --white: #ffffff;
+
+    margin: 0;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--white);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 78% 55%, rgba(20,143,139,.09), transparent 28%),
+      linear-gradient(180deg, #ffffff 0%, #f8fcfc 100%);
+    border-top: 1px solid #f0f3f5;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .mhp-hero * { box-sizing: border-box; }
+
+  .mhp-hero .container {
+    width: min(1180px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  .mhp-hero .hero-grid {
+    min-height: 650px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 64px;
+    padding: 72px 0;
+  }
+
+  .mhp-hero .eyebrow {
+    margin: 0 0 18px;
+    color: var(--teal-dark);
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+
+  .mhp-hero h1 {
+    max-width: 650px;
+    margin: 0;
+    font-size: clamp(44px, 5vw, 68px);
+    line-height: 1.03;
+    letter-spacing: -.045em;
+    font-weight: 750;
+    color: var(--navy);
+  }
+
+  .mhp-hero .accent-line {
+    width: 64px;
+    height: 4px;
+    margin: 30px 0;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+
+  .mhp-hero .lead {
+    max-width: 610px;
+    margin: 0 0 24px;
+    font-size: 21px;
+    line-height: 1.55;
+  }
+
+  .mhp-hero .body-copy {
+    max-width: 620px;
+    margin: 0 0 26px;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .mhp-hero .body-copy strong { color: var(--text); }
+
+  .mhp-hero .control-note {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 600px;
+    margin-top: 30px;
+    padding: 20px 24px;
+    border-radius: 18px;
+    background: var(--mint);
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+
+  .mhp-hero .shield {
+    width: 38px;
+    min-width: 38px;
+    height: 44px;
+    color: var(--teal);
+  }
+
+  .mhp-hero .graphic-wrap {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mhp-hero .graphic-orbit {
+    position: absolute;
+    width: 470px;
+    height: 470px;
+    border-radius: 50%;
+    background: rgba(20,143,139,.055);
+  }
+
+  .mhp-hero .graphic {
+    position: relative;
+    width: 100%;
+    max-width: 570px;
+    height: 470px;
+  }
+
+  .mhp-hero .node {
+    position: absolute;
+    top: 160px;
+    width: 112px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 13px;
+    line-height: 1.25;
+    letter-spacing: .01em;
+  }
+
+  .mhp-hero .node-left { left: 0; }
+  .mhp-hero .node-right { right: 0; }
+
+  .mhp-hero .node-icon {
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 13px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #d5dce4;
+    border-radius: 50%;
+    background: rgba(255,255,255,.88);
+    box-shadow: 0 6px 22px rgba(23,48,95,.07);
+  }
+
+  .mhp-hero .node svg {
+    width: 43px;
+    height: 43px;
+    stroke: var(--teal-dark);
+  }
+
+  .mhp-hero .laptop {
+    position: absolute;
+    left: 50%;
+    top: 76px;
+    width: 300px;
+    transform: translateX(-50%);
+  }
+
+  .mhp-hero .screen {
+    height: 225px;
+    padding: 18px;
+    border: 8px solid var(--navy);
+    border-bottom-width: 10px;
+    border-radius: 18px 18px 8px 8px;
+    background: white;
+    box-shadow: 0 18px 45px rgba(23,48,95,.12);
+  }
+
+  .mhp-hero .screen-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mhp-hero .mini-shield {
+    width: 38px;
+    height: 44px;
+    margin-bottom: 7px;
+  }
+
+  .mhp-hero .passport-title {
+    margin: 0 0 10px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.15;
+    font-weight: 850;
+  }
+
+  .mhp-hero .passport-number {
+    width: 100%;
+    padding: 10px 8px;
+    border: 1px solid #dfe6eb;
+    border-radius: 8px;
+    background: #f8fafb;
+    text-align: center;
+    color: var(--teal-dark);
+    font-size: 15px;
+    font-weight: 850;
+    letter-spacing: .04em;
+  }
+
+  .mhp-hero .copy-button {
+    margin-top: 12px;
+    padding: 9px 15px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--teal-dark);
+    color: white;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  .mhp-hero .base {
+    position: relative;
+    width: 340px;
+    height: 17px;
+    margin-left: -20px;
+    border-radius: 0 0 20px 20px;
+    background: #aeb9c3;
+    box-shadow: 0 7px 12px rgba(23,48,95,.15);
+  }
+
+  .mhp-hero .base::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    width: 110px;
+    height: 4px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #8d9aa5;
+  }
+
+  .mhp-hero .arrow {
+    position: absolute;
+    top: 205px;
+    color: var(--teal);
+    font-size: 40px;
+    font-weight: 300;
+  }
+
+  .mhp-hero .arrow-left { left: 115px; }
+  .mhp-hero .arrow-right { right: 115px; }
+
+  .mhp-hero .device-note {
+    position: absolute;
+    left: 50%;
+    top: 385px;
+    transform: translateX(-50%);
+    width: 250px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .mhp-hero .device-note strong {
+    display: block;
+    color: var(--teal-dark);
+    margin-bottom: 3px;
+  }
+
+  .mhp-hero .device-note svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+    margin-right: 4px;
+  }
+
+  .mhp-hero .footer-strip {
+    margin: 0 0 54px;
+    padding: 22px 30px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 8px 30px rgba(23,48,95,.05);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--muted);
+  }
+
+  .mhp-hero .footer-strip strong { color: var(--text); }
+
+  @media (max-width: 900px) {
+    .mhp-hero .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 56px 0 70px;
+    }
+    .mhp-hero .graphic-wrap {
+      min-height: 470px;
+    }
+    .mhp-hero .hero-copy {
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .mhp-hero .container {
+      width: min(100% - 30px, 1180px);
+    }
+    .mhp-hero h1 { font-size: 43px; }
+    .mhp-hero .lead { font-size: 18px; }
+    .mhp-hero .graphic {
+      transform: scale(.78);
+      transform-origin: center top;
+      width: 128%;
+      margin-left: -14%;
+    }
+    .mhp-hero .graphic-wrap { min-height: 390px; }
+    .mhp-hero .footer-strip {
+      margin-bottom: 30px;
+      padding: 18px;
+    }
+  }
+
+  /* ---- Technology section ---- */
+  .tech-section {
+    --mint: #EAF7F6;
+    background: #FBFCFB;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+    padding: 72px 0;
+  }
+
+  .tech-container {
+    width: min(1180px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  @media (min-width: 980px) {
+    .tech-grid { grid-template-columns: 0.85fr 1.15fr; gap: 56px; }
+  }
+
+  .tech-eyebrow {
+    margin: 0 0 14px;
+    color: var(--teal-dark);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+
+  .tech-title {
+    margin: 0;
+    font-size: clamp(30px, 3.6vw, 42px);
+    line-height: 1.06;
+    letter-spacing: -.03em;
+    font-weight: 750;
+    color: var(--ink);
+  }
+
+  .tech-accent {
+    width: 56px;
+    height: 4px;
+    margin: 22px 0;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+
+  .tech-intro {
+    margin: 0 0 30px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink);
+    max-width: 52ch;
+  }
+  .tech-intro strong { color: var(--teal-dark); }
+
+  .tech-block {
+    margin-bottom: 26px;
+  }
+  .tech-block:last-child { margin-bottom: 0; }
+
+  .tech-h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+  }
+
+  .tech-p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 54ch;
+  }
+  .tech-p strong { color: var(--ink); }
+
+  .tech-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 14px 0;
+  }
+
+  .tech-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .tech-chip svg { width: 16px; height: 16px; stroke: var(--teal-dark); flex: none; }
+
+  /* Step flow */
+  .tech-steps-title {
+    margin: 0 0 24px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+  }
+
+  .tech-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 1180px) {
+    .tech-steps { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .tech-steps { grid-template-columns: 1fr; }
+  }
+
+  .tech-step {
+    position: relative;
+    text-align: left;
+  }
+
+  .tech-step-icon {
+    width: 66px;
+    height: 66px;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid var(--line);
+    border-radius: 50%;
+    background: #fff;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .tech-step-icon svg { width: 30px; height: 30px; stroke: var(--teal-dark); fill: none; }
+  .tech-step-icon.badge svg { stroke: none; fill: #fff; }
+  .tech-step-icon.badge { background: var(--teal); border-color: var(--teal); }
+
+  .tech-step-num {
+    position: absolute;
+    left: -2px;
+    bottom: -2px;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--teal-dark);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .tech-step h4 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 750;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+
+  .tech-step p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* Lower two-panel row */
+  .tech-lower {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px) {
+    .tech-lower { grid-template-columns: 1fr 1fr; }
+  }
+
+  .tech-panel {
+    background: var(--mint);
+    border: 1px solid var(--line-soft);
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .tech-panel-title {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+  }
+
+  .tech-panel p.tech-p { margin-bottom: 14px; }
+
+  .tech-feature {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .tech-feature:last-child { margin-bottom: 0; }
+
+  .tech-feature-icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--line-soft);
+  }
+  .tech-feature-icon svg { width: 19px; height: 19px; stroke: var(--teal-dark); fill: none; }
+
+  .tech-feature strong {
+    display: block;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .tech-feature span {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .tech-footer {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 22px 28px;
+    background: #fff;
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+  }
+  @media (min-width: 720px) {
+    .tech-footer { grid-template-columns: 1fr 1fr; }
+  }
+
+  .tech-footer-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .tech-footer-item svg { width: 26px; height: 26px; stroke: var(--teal-dark); fill: none; flex: none; margin-top: 2px; }
+  .tech-footer-item strong { display: block; font-size: 15px; color: var(--ink); margin-bottom: 3px; }
+  .tech-footer-item span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 8.5C11 7.12 12.12 6 13.5 6H31C32.66 6 34 7.34 34 9V38C34 39.1 33.1 40 32 40H14.5C12.57 40 11 38.43 11 36.5V8.5Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M11 34.5C11 33.12 12.12 32 13.5 32H34V36.5C34 38.43 32.43 40 30.5 40H13.5C12.12 40 11 38.88 11 37.5V34.5Z" fill="var(--ink)" fill-opacity="0.06" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M22.5 13L28.5 15.1V19.3C28.5 23 26 25.9 22.5 27C19 25.9 16.5 23 16.5 19.3V15.1L22.5 13Z" fill="var(--teal)"/>
+        <circle cx="22.5" cy="18.3" r="1.9" fill="#fff"/>
+        <path d="M19.3 22.5C19.3 20.6 20.7 19.6 22.5 19.6C24.3 19.6 25.7 20.6 25.7 22.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-divider"></div>
+      <div class="brand-text">
+        <span class="brand-name"><span class="line1">My Health</span><span class="line2">Passport</span></span>
+        <span class="brand-tagline">Your health research identity. <span class="accent">Your choice.</span></span>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <a href="#how">About</a>
+      <span class="dot"></span>
+      <a href="#generate">Generate</a>
+      <span class="dot"></span>
+      <a href="#technology">Technology</a>
+      <span class="dot"></span>
+      <a href="#privacy">Privacy</a>
+    </nav>
+
+    <a class="cta-pill" href="#builder">
+      <span class="full">Create your Passport</span>
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+</header>
+
+<main class="hero mhp-hero" id="how">
+  <div class="container">
+    <div class="hero-grid">
+
+      <!-- Description -->
+      <section class="hero-copy" aria-labelledby="hero-title">
+        <p class="eyebrow">Private. Secure. You choose.</p>
+
+        <h1 id="hero-title">A private identity for health research.</h1>
+
+        <div class="accent-line" aria-hidden="true"></div>
+
+        <p class="lead">
+          My Health Passport gives you a unique research identifier
+          that you can use when participating in health research.
+        </p>
+
+        <p class="body-copy">
+          Create your Passport Number using your own identifying information.
+          The information you enter <strong>stays on your device</strong> —
+          it is not sent to the cloud or shared with third parties by
+          My Health Passport.
+        </p>
+
+        <p class="body-copy">
+          You can then copy your Passport Number and share it with
+          participating researchers. Using the same number over time can
+          help researchers <strong>connect your responses</strong> across
+          surveys and, where appropriate, link research data with other
+          approved health datasets.
+        </p>
+
+        <div class="control-note">
+          <svg class="shield" viewBox="0 0 48 54" fill="none" aria-hidden="true">
+            <path d="M24 2 44 10v15c0 13-8.4 22.8-20 27C12.4 47.8 4 38 4 25V10L24 2Z"
+                  stroke="currentColor" stroke-width="3"/>
+            <path d="m15 27 6 6 12-14" stroke="currentColor" stroke-width="3"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>You stay in control of when and where you share your Passport Number.</span>
+        </div>
+      </section>
+
+      <!-- Information graphic -->
+      <section class="graphic-wrap" aria-label="How My Health Passport works">
+        <div class="graphic-orbit" aria-hidden="true"></div>
+
+        <div class="graphic">
+
+          <!-- Left node -->
+          <div class="node node-left">
+            <div class="node-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="24" cy="16" r="7"/>
+                <path d="M10 40c1.7-8 6.5-12 14-12s12.3 4 14 12"/>
+              </svg>
+            </div>
+            YOUR<br>INFORMATION
+          </div>
+
+          <!-- Left arrow -->
+          <div class="arrow arrow-left" aria-hidden="true">→</div>
+
+          <!-- Laptop / passport number -->
+          <div class="laptop">
+            <div class="screen">
+              <div class="screen-inner">
+                <svg class="mini-shield" viewBox="0 0 48 54" fill="none"
+                     aria-hidden="true">
+                  <path d="M24 2 44 10v15c0 13-8.4 22.8-20 27C12.4 47.8 4 38 4 25V10L24 2Z"
+                        fill="#148f8b"/>
+                  <path d="M18 26v-5a6 6 0 0 1 12 0v5"
+                        stroke="white" stroke-width="3"/>
+                  <rect x="16" y="25" width="16" height="12" rx="2"
+                        fill="white"/>
+                </svg>
+
+                <p class="passport-title">
+                  MY HEALTH<br>PASSPORT NUMBER
+                </p>
+
+                <div class="passport-number">MP-7F3K-92Q8-4LM6</div>
+
+                <button class="copy-button" type="button">
+                  ▣ &nbsp; Copy to clipboard
+                </button>
+              </div>
+            </div>
+            <div class="base"></div>
+          </div>
+
+          <!-- Right arrow -->
+          <div class="arrow arrow-right" aria-hidden="true">→</div>
+
+          <!-- Right node -->
+          <div class="node node-right">
+            <div class="node-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="24" cy="15" r="6"/>
+                <path d="M13 38c1.5-7 5.2-10 11-10s9.5 3 11 10"/>
+                <path d="M8 20a5 5 0 1 0 0 10"/>
+                <path d="M40 20a5 5 0 1 1 0 10"/>
+              </svg>
+            </div>
+            YOU CHOOSE<br>WHO TO SHARE<br>IT WITH
+          </div>
+
+          <!-- Device privacy note -->
+          <div class="device-note">
+            <strong>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <rect x="5" y="10" width="14" height="11" rx="2"/>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+              </svg>
+              Processed on your device.
+            </strong>
+            Your information stays with you.
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <div class="footer-strip">
+      <span aria-hidden="true" style="font-size:26px;">⌘</span>
+      <div>
+        <strong>Designed to support research. Built for privacy.</strong>
+        <span> &nbsp;|&nbsp; </span>
+        Based on the SLK-581 (Statistical Linkage Key 581) approach used in
+        Australian health data environments.
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="wrap">
+
+  <header class="form-intro" id="generate">
+    <p class="section-eyebrow">Your details, your device</p>
+    <h2 class="section-title">Generate Your Passport Number Now</h2>
+    <div class="section-accent" aria-hidden="true"></div>
+    <p class="section-lede">Fill in each field below. When you're done, make a note of your Passport Number, or copy it straight to your computer's clipboard.</p>
+  </header>
+
+  <div class="layout" id="builder">
+
+    <form class="panel" id="form" autocomplete="off">
+
+      <fieldset>
+        <label for="surname">Family name <span class="required-mark">*</span></label>
+        <input type="text" id="surname" placeholder="e.g. O'Brien-Smith">
+        <p class="required-note"><span class="required-mark">*</span>This field is compulsory</p>
+      </fieldset>
+
+      <fieldset>
+        <label for="givenname">First given name <span class="required-mark">*</span></label>
+        <input type="text" id="givenname" placeholder="e.g. Elizabeth">
+        <p class="required-note"><span class="required-mark">*</span>This field is compulsory</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Date of birth</legend>
+        <div class="dob-row">
+          <div>
+            <label for="day">Day <span class="required-mark">*</span></label>
+            <select id="day"></select>
+            <p class="required-note"><span class="required-mark">*</span>Compulsory</p>
+          </div>
+          <div>
+            <label for="month">Month <span class="required-mark">*</span></label>
+            <select id="month"></select>
+            <p class="required-note"><span class="required-mark">*</span>Compulsory</p>
+          </div>
+          <div>
+            <label for="year">Year <span class="required-mark">*</span></label>
+            <input type="text" id="year" inputmode="numeric" maxlength="4" placeholder="YYYY">
+            <p class="required-note"><span class="required-mark">*</span>Compulsory</p>
+          </div>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="dayUnknown"> Day unknown</label>
+          <label><input type="checkbox" id="monthUnknown"> Month unknown</label>
+          <label><input type="checkbox" id="yearUnknown"> Year unknown</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <label for="sex">Sex <span class="required-mark">*</span></label>
+        <select id="sex">
+          <option value="">Select…</option>
+          <option value="1">Male (1)</option>
+          <option value="2">Female (2)</option>
+          <option value="3">Intersex or indeterminate (3)</option>
+          <option value="9">Not stated (9)</option>
+        </select>
+        <p class="required-note"><span class="required-mark">*</span>This field is compulsory</p>
+      </fieldset>
+
+    </form>
+
+    <div class="panel result-panel" id="resultPanel" hidden>
+      <h2>Your Health Passport Number</h2>
+
+      <div class="key-strip">
+        <div class="key-group">
+          <div class="key-boxes" id="boxesSurname"></div>
+          <span class="key-label">Family name (2,3,5)</span>
+        </div>
+        <div class="key-group">
+          <div class="key-boxes" id="boxesGiven"></div>
+          <span class="key-label">Given name (2,3)</span>
+        </div>
+        <div class="key-group">
+          <div class="key-boxes" id="boxesDob"></div>
+          <span class="key-label">Date of birth</span>
+        </div>
+        <div class="key-group">
+          <div class="key-boxes" id="boxesSex"></div>
+          <span class="key-label">Sex</span>
+        </div>
+      </div>
+
+      <div class="full-key-row">
+        <div class="full-key" id="fullKey">&nbsp;</div>
+        <button type="button" class="copy" id="copyBtn" disabled>Copy key</button>
+      </div>
+      <div class="status" id="status"></div>
+
+      <div class="privacy-note" id="privacy">
+        <strong>Nothing is sent anywhere.</strong> Every calculation happens in your browser — the details you enter never leave this page or get stored.
+      </div>
+    </div>
+
+  </div>
+
+  <footer id="about" style="max-width:640px;margin-top:40px;padding-top:24px;border-top:1px solid var(--line-soft);font-size:13px;color:var(--muted);">
+    This tool generates the Statistical Linkage Key (SLK-581) format used across Australian health and community-service datasets. It's an independent utility, not an official Australian Institute of Health and Welfare (AIHW) product.
+  </footer>
+
+</div>
+
+<section class="tech-section" id="technology">
+  <div class="tech-container">
+    <div class="tech-grid">
+
+      <!-- Left: explanation -->
+      <div>
+        <p class="tech-eyebrow">Private. Secure. You choose.</p>
+        <h2 class="tech-title">My Health Passport Number Technology</h2>
+        <div class="tech-accent" aria-hidden="true"></div>
+
+        <p class="tech-intro">
+          Your My Health Passport Number is generated using the <strong>SLK-581 (Statistical Linkage Key 581)</strong> —
+          a privacy-preserving data linkage key used across Australia's health data environment.
+        </p>
+
+        <div class="tech-block">
+          <p class="tech-h3">What is SLK-581?</p>
+          <p class="tech-p">SLK-581 is a statistical linkage key format developed by the Australian Institute of Health and Welfare (AIHW). It's designed to bring records relating to the same person together across different datasets — without revealing their identity.</p>
+        </div>
+
+        <div class="tech-block">
+          <p class="tech-h3">How is it generated?</p>
+          <p class="tech-p">Your identifying information is used on your device to create a unique SLK-581 key. The key is built from selected letters and digits of your:</p>
+          <div class="tech-chips">
+            <span class="tech-chip">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-7 8-7s7 2.5 8 7"/></svg>
+              First name
+            </span>
+            <span class="tech-chip">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-7 8-7s7 2.5 8 7"/></svg>
+              Surname
+            </span>
+            <span class="tech-chip">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+              Date of birth
+            </span>
+            <span class="tech-chip">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M12 14v7M9 18h6"/></svg>
+              Sex
+            </span>
+          </div>
+          <p class="tech-p">These elements are converted into a <strong>one-way, non-reversible key</strong>. It isn't possible to derive your personal information from the key alone.</p>
+        </div>
+
+        <div class="tech-block">
+          <p class="tech-h3">Its purpose and use</p>
+          <p class="tech-p">SLK-581 allows data from different sources to be linked for research and planning purposes, while protecting personal privacy. When appropriately approved, it lets a researcher link data from their study with other health datasets, without knowing, sharing or recording personal identifying information like your name, date of birth, address or sex.</p>
+        </div>
+      </div>
+
+      <!-- Right: how it works + panels -->
+      <div>
+        <p class="tech-steps-title">How SLK-581 works</p>
+        <div class="tech-steps">
+
+          <div class="tech-step">
+            <div class="tech-step-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 20h20"/><rect x="10" y="8" width="4" height="4" rx="0.5"/></svg>
+              <span class="tech-step-num">1</span>
+            </div>
+            <h4>Information stays with you</h4>
+            <p>You enter your identifying information on your device. It's not sent to any server.</p>
+          </div>
+
+          <div class="tech-step">
+            <div class="tech-step-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="1.5"/><circle cx="12" cy="11" r="2.6"/><path d="M12 3.5v1.4M12 16v1.4M5.5 11H4M20 11h-1.5"/></svg>
+              <span class="tech-step-num">2</span>
+            </div>
+            <h4>SLK-581 key generated locally</h4>
+            <p>Your device uses the information to create your unique SLK-581 key — your Passport Number.</p>
+          </div>
+
+          <div class="tech-step">
+            <div class="tech-step-icon badge">
+              <svg viewBox="0 0 24 24" stroke-width="0"><path d="M12 2 20 5.2v6.3c0 5.7-3.6 9.9-8 11.5-4.4-1.6-8-5.8-8-11.5V5.2L12 2Z"/></svg>
+              <span class="tech-step-num">3</span>
+            </div>
+            <h4>Privacy-preserving key</h4>
+            <p>The key is a one-way, non-reversible code. It can't be used to determine your identity.</p>
+          </div>
+
+          <div class="tech-step">
+            <div class="tech-step-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+              <span class="tech-step-num">4</span>
+            </div>
+            <h4>Used in approved research</h4>
+            <p>Where ethically and legally approved, researchers use the key to link data across health datasets.</p>
+          </div>
+
+          <div class="tech-step">
+            <div class="tech-step-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M4 16l5-6 4 4 6-8"/></svg>
+              <span class="tech-step-num">5</span>
+            </div>
+            <h4>Better insights, better health</h4>
+            <p>Linked data helps researchers generate better evidence to improve health and health services.</p>
+          </div>
+
+        </div>
+
+        <div class="tech-lower">
+
+          <div class="tech-panel">
+            <p class="tech-panel-title">Widely used in Australian health data</p>
+            <p class="tech-p">SLK-581 is one of the most widely used linkage-key formats in Australian health and community-service data collections. It was developed by the AIHW and has been applied in hospital, aged-care and national registry data linkage for over a decade.</p>
+            <p class="tech-p">This tool is an independent, open implementation of the SLK-581 format — it isn't an official AIHW product.</p>
+          </div>
+
+          <div class="tech-panel">
+            <p class="tech-panel-title">Key features</p>
+
+            <div class="tech-feature">
+              <div class="tech-feature-icon">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>
+              </div>
+              <div><strong>Privacy by design</strong><span>SLK-581 protects your identity by design — it doesn't expose your personal information.</span></div>
+            </div>
+
+            <div class="tech-feature">
+              <div class="tech-feature-icon">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 5.2v6.3c0 5.7-3.6 9.9-8 11.5-4.4-1.6-8-5.8-8-11.5V5.2L12 2Z"/></svg>
+              </div>
+              <div><strong>One-way and non-reversible</strong><span>The key can't be reverse-engineered to reveal your identity.</span></div>
+            </div>
+
+            <div class="tech-feature">
+              <div class="tech-feature-icon">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+              </div>
+              <div><strong>No central identity database</strong><span>My Health Passport doesn't store or hold your identifying information.</span></div>
+            </div>
+
+            <div class="tech-feature">
+              <div class="tech-feature-icon">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-7 8-7s7 2.5 8 7"/></svg>
+              </div>
+              <div><strong>Approved use only</strong><span>Linkage can only occur in approved environments with governance and ethics oversight.</span></div>
+            </div>
+
+            <div class="tech-feature">
+              <div class="tech-feature-icon">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><circle cx="17" cy="10" r="2.6"/><path d="M3 20c.6-3.6 3-5.6 6-5.6s5.4 2 6 5.6M15.5 14.6c2.4.2 4 1.9 4.5 4.6"/></svg>
+              </div>
+              <div><strong>Benefits research, protects you</strong><span>Enables important research and planning while keeping your personal data private.</span></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="tech-footer">
+          <div class="tech-footer-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 5.2v6.3c0 5.7-3.6 9.9-8 11.5-4.4-1.6-8-5.8-8-11.5V5.2L12 2Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>
+            <div><strong>Your identity stays yours.</strong><span>My Health Passport Number (SLK-581) helps connect data for research — without exposing who you are.</span></div>
+          </div>
+          <div class="tech-footer-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="14.5" r="3.5"/><path d="M10.6 12 19 3.6M16 6l2 2M13.4 9.6l2 2"/></svg>
+            <div><strong>One key. Many benefits. Total privacy.</strong><span>A small piece of information that makes a big difference to health research and outcomes.</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const surnameInput = document.getElementById('surname');
+  const givenInput = document.getElementById('givenname');
+  const daySelect = document.getElementById('day');
+  const monthSelect = document.getElementById('month');
+  const yearInput = document.getElementById('year');
+  const dayUnknown = document.getElementById('dayUnknown');
+  const monthUnknown = document.getElementById('monthUnknown');
+  const yearUnknown = document.getElementById('yearUnknown');
+  const sexSelect = document.getElementById('sex');
+
+  const boxesSurname = document.getElementById('boxesSurname');
+  const boxesGiven = document.getElementById('boxesGiven');
+  const boxesDob = document.getElementById('boxesDob');
+  const boxesSex = document.getElementById('boxesSex');
+  const fullKey = document.getElementById('fullKey');
+  const copyBtn = document.getElementById('copyBtn');
+  const status = document.getElementById('status');
+  const resultPanel = document.getElementById('resultPanel');
+
+  // Populate day/month selects
+  for (let d = 1; d <= 31; d++) {
+    const opt = document.createElement('option');
+    opt.value = String(d).padStart(2, '0');
+    opt.textContent = d;
+    daySelect.appendChild(opt);
+  }
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  monthNames.forEach((name, i) => {
+    const opt = document.createElement('option');
+    opt.value = String(i + 1).padStart(2, '0');
+    opt.textContent = name;
+    monthSelect.appendChild(opt);
+  });
+  daySelect.value = '';
+  daySelect.selectedIndex = 0;
+  monthSelect.selectedIndex = 0;
+  const blankFirst = (sel) => {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '—';
+    sel.insertBefore(opt, sel.firstChild);
+    sel.value = '';
+  };
+  blankFirst(daySelect);
+  blankFirst(monthSelect);
+
+  // Extract letters at given 1-indexed positions from alphabetic-only characters
+  function extractLetters(raw, positions) {
+    const alphaOnly = (raw || '').toUpperCase().replace(/[^A-Z]/g, '');
+    return positions.map(p => alphaOnly[p - 1] || null);
+  }
+
+  function buildBoxes(container, chars) {
+    container.innerHTML = '';
+    chars.forEach(c => {
+      const box = document.createElement('div');
+      box.className = 'key-box ' + (c ? 'filled' : 'empty');
+      box.textContent = c || '·';
+      container.appendChild(box);
+    });
+  }
+
+  function compute() {
+    const surnameLetters = extractLetters(surnameInput.value, [2, 3, 5]).map(c => c || '2');
+    const surnameFilled = extractLetters(surnameInput.value, [2, 3, 5]);
+    // Only substitute '2' once at least one letter exists overall, otherwise leave blank (empty state)
+    const hasSurnameInput = surnameInput.value.replace(/[^A-Za-z]/g, '').length > 0;
+    const surnameChars = hasSurnameInput ? surnameFilled.map(c => c || '2') : [null, null, null];
+
+    const givenFilled = extractLetters(givenInput.value, [2, 3]);
+    const hasGivenInput = givenInput.value.replace(/[^A-Za-z]/g, '').length > 0;
+    const givenChars = hasGivenInput ? givenFilled.map(c => c || '2') : [null, null];
+
+    const day = dayUnknown.checked ? '99' : (daySelect.value || null);
+    const month = monthUnknown.checked ? '99' : (monthSelect.value || null);
+    let yearVal = yearInput.value.replace(/[^0-9]/g, '').slice(0, 4);
+    const year = yearUnknown.checked ? '9999' : (yearVal.length === 4 ? yearVal : null);
+
+    const dobChars = [];
+    (day || '..').split('').forEach(c => dobChars.push(day ? c : null));
+    (month || '..').split('').forEach(c => dobChars.push(month ? c : null));
+    (year || '....').split('').forEach(c => dobChars.push(year ? c : null));
+
+    const sexChar = sexSelect.value || null;
+
+    buildBoxes(boxesSurname, surnameChars);
+    buildBoxes(boxesGiven, givenChars);
+    buildBoxes(boxesDob, dobChars);
+    buildBoxes(boxesSex, [sexChar]);
+
+    const allChars = [...surnameChars, ...givenChars, ...dobChars, sexChar];
+    const complete = allChars.every(c => c);
+
+    if (complete) {
+      fullKey.innerHTML = allChars.join('');
+      copyBtn.disabled = false;
+      resultPanel.hidden = false;
+    } else {
+      const shown = allChars.map(c => c || '<span class="dim">_</span>').join('');
+      fullKey.innerHTML = shown;
+      copyBtn.disabled = true;
+      resultPanel.hidden = true;
+    }
+    status.textContent = '';
+    status.classList.remove('ok');
+
+    return complete ? allChars.join('') : null;
+  }
+
+  [surnameInput, givenInput, daySelect, monthSelect, yearInput, sexSelect].forEach(el => {
+    el.addEventListener('input', compute);
+    el.addEventListener('change', compute);
+  });
+  [dayUnknown, monthUnknown, yearUnknown].forEach(chk => {
+    chk.addEventListener('change', () => {
+      const target = chk === dayUnknown ? daySelect : (chk === monthUnknown ? monthSelect : yearInput);
+      target.disabled = chk.checked;
+      compute();
+    });
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const key = compute();
+    if (!key) return;
+    navigator.clipboard.writeText(key).then(() => {
+      status.textContent = 'Copied to clipboard.';
+      status.classList.add('ok');
+    }).catch(() => {
+      status.textContent = 'Could not copy automatically — select the key text manually.';
+    });
+  });
+
+  compute();
+})();
+</script>
+</body>
+</html>
