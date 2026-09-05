@@ -971,6 +971,239 @@
   .tech-footer-item strong { display: block; font-size: 15px; color: var(--ink); margin-bottom: 3px; }
   .tech-footer-item span { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
+  /* ---- Privacy and Performance section (scoped) ---- */
+  .pp-section {
+    --navy: #17305f;
+    --teal: #148f8b;
+    --dark: #0d7774;
+    --mint: #eaf7f6;
+    --muted: #52627d;
+    --line: #dfe8ed;
+    font-family: Inter, Arial, sans-serif;
+    color: var(--navy);
+    padding: 72px 0;
+    background: linear-gradient(#fff, #f8fcfc);
+    border-top: 1px solid var(--line-soft);
+  }
+  .pp-section * { box-sizing: border-box; }
+
+  .pp-wrap { width: min(1180px, calc(100% - 40px)); margin: auto; }
+
+  .pp-grid {
+    display: grid;
+    grid-template-columns: .85fr 1.15fr;
+    gap: 58px;
+    align-items: start;
+  }
+
+  .pp-eyebrow, .pp-panel h2, .pp-copy h2 {
+    color: var(--dark);
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .pp-eyebrow { font-size: 14px; margin: 0 0 18px; }
+
+  .pp-copy h1 {
+    font-size: clamp(44px, 5vw, 64px);
+    line-height: 1.02;
+    letter-spacing: -.045em;
+    margin: 0;
+  }
+
+  .pp-accent {
+    width: 64px;
+    height: 4px;
+    background: var(--teal);
+    border-radius: 5px;
+    margin: 28px 0;
+  }
+
+  .pp-lead { font-size: 20px; line-height: 1.55; }
+  .pp-copy h2 { font-size: 15px; margin: 30px 0 8px; }
+  .pp-copy p { font-size: 16px; line-height: 1.65; color: var(--muted); }
+  .pp-copy strong { color: var(--navy); }
+
+  .pp-callout, .pp-privacy {
+    background: var(--mint);
+    border-radius: 17px;
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    margin-top: 28px;
+  }
+  .pp-callout b { display: block; }
+  .pp-callout span { color: var(--muted); font-size: 14px; }
+
+  .pp-panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 21px;
+    padding: 25px;
+    box-shadow: 0 10px 35px #17305f0d;
+    margin-bottom: 20px;
+  }
+  .pp-panel h2 { font-size: 17px; margin: 0 0 7px; }
+  .pp-sub { font-size: 14px; line-height: 1.5; font-weight: 650; margin: 0 0 22px; }
+
+  .pp-flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .pp-step { text-align: center; position: relative; }
+  .pp-step:not(:last-child):after {
+    content: "→";
+    position: absolute;
+    right: -13px;
+    top: 22px;
+    color: var(--teal);
+    font-size: 22px;
+  }
+
+  .pp-icon {
+    width: 66px;
+    height: 66px;
+    border: 2px solid #d6e0e6;
+    border-radius: 50%;
+    margin: auto;
+    display: grid;
+    place-items: center;
+  }
+  .pp-icon svg { width: 34px; height: 34px; stroke: var(--dark); fill: none; stroke-width: 2; }
+
+  .pp-num {
+    display: inline-grid;
+    place-items: center;
+    background: var(--dark);
+    color: #fff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 9px;
+  }
+
+  .pp-step h3 { font-size: 12px; line-height: 1.25; margin: 6px 0; }
+  .pp-step p { font-size: 10.5px; line-height: 1.4; color: var(--muted); margin: 0; }
+
+  .pp-privacy { align-items: center; margin-top: 20px; padding: 14px 16px; font-size: 13px; font-weight: 700; }
+
+  .pp-metrics { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .pp-metric { text-align: center; padding: 10px 15px; border-right: 1px solid var(--line); }
+  .pp-metric:last-child { border: 0; }
+  .pp-metric strong { display: block; color: var(--dark); font-size: 31px; }
+  .pp-metric b { font-size: 12px; }
+  .pp-metric p { font-size: 10.5px; line-height: 1.45; color: var(--muted); }
+
+  .pp-note {
+    background: #f4fbfb;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 18px;
+  }
+  .pp-note a { color: var(--dark); font-weight: 700; }
+
+  .pp-warning { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 12px; }
+
+  @media (max-width: 900px) {
+    .pp-grid { grid-template-columns: 1fr; }
+    .pp-flow { grid-template-columns: repeat(5, 1fr); }
+  }
+
+  @media (max-width: 620px) {
+    .pp-wrap { width: calc(100% - 28px); }
+    .pp-section { padding: 48px 0; }
+    .pp-flow { grid-template-columns: 1fr; }
+    .pp-step {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      text-align: left;
+      column-gap: 12px;
+      align-items: center;
+    }
+    .pp-step:after {
+      content: "↓" !important;
+      left: 22px;
+      right: auto !important;
+      top: 66px !important;
+    }
+    .pp-icon { grid-row: span 3; margin: 0; }
+    .pp-num { margin: 0; }
+    .pp-step h3, .pp-step p { grid-column: 2; }
+    .pp-metrics { grid-template-columns: 1fr; }
+    .pp-metric { border-right: 0; border-bottom: 1px solid var(--line); }
+    .pp-metric:last-child { border-bottom: 0; }
+  }
+
+  /* ---- Resources for Researchers ---- */
+  .resources-section {
+    padding: 72px 0;
+    background: var(--bg);
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .resources-container {
+    width: min(920px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  .resources-intro {
+    max-width: 640px;
+    margin-bottom: 32px;
+  }
+
+  .resource-card {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .resource-icon {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--amber-soft);
+    border: 1px solid var(--amber);
+  }
+  .resource-icon svg { width: 22px; height: 22px; stroke: #7A4C10; fill: none; }
+
+  .resource-body h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .resource-body p {
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 56ch;
+  }
+
+  .resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--teal);
+    padding-bottom: 1px;
+  }
+  .resource-link:hover { color: var(--teal); }
+  .resource-link svg { width: 15px; height: 15px; }
+
 </style>
 </head>
 <body>
@@ -995,11 +1228,11 @@
     <nav class="site-nav">
       <a href="#how">About</a>
       <span class="dot"></span>
-      <a href="#generate">Generate</a>
-      <span class="dot"></span>
       <a href="#technology">Technology</a>
       <span class="dot"></span>
       <a href="#privacy">Privacy</a>
+      <span class="dot"></span>
+      <a href="#resources">Resources</a>
     </nav>
 
     <a class="cta-pill" href="#builder">
@@ -1031,6 +1264,11 @@
           The information you enter <strong>stays on your device</strong> —
           it is not sent to the cloud or shared with third parties by
           My Health Passport.
+        </p>
+
+        <p class="body-copy">
+          Elements of your name, date of birth, and gender are encoded,
+          which makes re-identification of you difficult.
         </p>
 
         <p class="body-copy">
@@ -1240,7 +1478,7 @@
       </div>
       <div class="status" id="status"></div>
 
-      <div class="privacy-note" id="privacy">
+      <div class="privacy-note" id="privacy-note">
         <strong>Nothing is sent anywhere.</strong> Every calculation happens in your browser — the details you enter never leave this page or get stored.
       </div>
     </div>
@@ -1294,7 +1532,7 @@
               Sex
             </span>
           </div>
-          <p class="tech-p">These elements are converted into a <strong>one-way, non-reversible key</strong>. It isn't possible to derive your personal information from the key alone.</p>
+          <p class="tech-p">These elements are converted into a <strong>coded, one-way key</strong>. Reverse engineering the key to successfully identify you by name is very unlikely.</p>
         </div>
 
         <div class="tech-block">
@@ -1332,7 +1570,7 @@
               <span class="tech-step-num">3</span>
             </div>
             <h4>Privacy-preserving key</h4>
-            <p>The key is a one-way, non-reversible code. It can't be used to determine your identity.</p>
+            <p>The key uses a coded, one-way format. It's very unlikely to be used to successfully identify you by name.</p>
           </div>
 
           <div class="tech-step">
@@ -1377,7 +1615,7 @@
               <div class="tech-feature-icon">
                 <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 5.2v6.3c0 5.7-3.6 9.9-8 11.5-4.4-1.6-8-5.8-8-11.5V5.2L12 2Z"/></svg>
               </div>
-              <div><strong>One-way and non-reversible</strong><span>The key can't be reverse-engineered to reveal your identity.</span></div>
+              <div><strong>One-way and coded</strong><span>Reverse engineering the key to successfully identify you by name is very unlikely.</span></div>
             </div>
 
             <div class="tech-feature">
@@ -1415,6 +1653,91 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pp-section" id="privacy">
+<div class="pp-wrap"><div class="pp-grid">
+
+<div class="pp-copy">
+<p class="pp-eyebrow">Private. Secure. You choose.</p>
+<h1>Privacy and Performance</h1><div class="pp-accent"></div>
+<p class="pp-lead">My Health Passport is designed with privacy at its core, while using a linkage approach that has been evaluated in Australian health-data research.</p>
+
+<h2>Your information stays with you</h2>
+<p>The identifying information you enter to create your My Health Passport Number is processed <strong>locally within your browser</strong>. This page does not send that information to My Health Passport servers for processing.</p>
+<p>The implementation is designed not to place identifying inputs in cookies, local storage or session storage. The generated Passport Number is what you can copy and choose to share.</p>
+
+<h2>Almost completely unique</h2>
+<p>Your Passport Number is derived from the core demographic elements used by SLK-581. The combination is designed to make accidental duplication uncommon, although no statistical linkage key is guaranteed to be unique for every person.</p>
+
+<h2>Performance you can trust</h2>
+<p>Published Australian research has found that SLK-based linkage can achieve very high match quality. In one AIHW evaluation, a stepwise strategy using SLK-581 with additional common variables achieved a <strong>99.7% positive predictive value</strong> and <strong>98.5% sensitivity</strong> compared with a reference name-based strategy.</p>
+
+<div class="pp-callout"><div style="font-size:28px;color:var(--teal)">✓</div><div><b>Your privacy is protected. Performance is proven.</b><span>Linkage performance depends on the quality and completeness of the information available in the datasets being linked.</span></div></div>
+</div>
+
+<div>
+<div class="pp-panel">
+<h2>Privacy by design</h2>
+<p class="pp-sub">Your identifying information is processed locally in your browser.</p>
+<div class="pp-flow">
+
+<div class="pp-step"><div class="pp-icon"><svg viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="25" rx="3"/><path d="M17 41h14M24 35v6M18 24v-3a6 6 0 0 1 12 0v3M16 24h16v10H16z"/></svg></div><span class="pp-num">1</span><h3>You enter information</h3><p>Entered into this browser on your device.</p></div>
+
+<div class="pp-step"><div class="pp-icon"><svg viewBox="0 0 48 48"><rect x="7" y="8" width="34" height="32" rx="4"/><path d="M7 16h34M18 28h12M24 22v12"/></svg></div><span class="pp-num">2</span><h3>Encoded locally</h3><p>Used in memory within your browser.</p></div>
+
+<div class="pp-step"><div class="pp-icon"><svg viewBox="0 0 48 48"><path d="M24 5l16 6v12c0 10-7 18-16 21-9-3-16-11-16-21V11l16-6z"/><path d="M18 24h12M24 18v12"/></svg></div><span class="pp-num">3</span><h3>Passport Number</h3><p>Generated locally from supplied data.</p></div>
+
+<div class="pp-step"><div class="pp-icon"><svg viewBox="0 0 48 48"><rect x="10" y="7" width="28" height="34" rx="3"/><path d="M17 25l5 5 10-11"/></svg></div><span class="pp-num">4</span><h3>Not stored</h3><p>No cookies, local storage or session storage for inputs.</p></div>
+
+<div class="pp-step"><div class="pp-icon"><svg viewBox="0 0 48 48"><path d="M13 35h22M17 31c-5 0-8-3-8-8 0-4 3-7 7-7 1-5 5-8 10-8 6 0 10 4 10 10"/><path d="M11 11l26 26"/></svg></div><span class="pp-num">5</span><h3>Not uploaded</h3><p>Identifying information is not sent to the cloud by this page.</p></div>
+
+</div>
+<div class="pp-privacy">🔒 &nbsp; Your identifying information stays on your device. Only the Passport Number is designed to be shared.</div>
+</div>
+
+<div class="pp-panel">
+<h2>Performance you can trust</h2>
+<p class="pp-sub">SLK-581 has been evaluated in Australian health-data linkage studies.</p>
+<div class="pp-metrics">
+<div class="pp-metric"><strong>99.7%</strong><b>Positive predictive value</b><p>AIHW evaluation of a stepwise SLK-based linkage strategy using SLK-581 with additional common variables.</p></div>
+<div class="pp-metric"><strong>98.5%</strong><b>Sensitivity</b><p>Reference links identified by that stepwise SLK-based strategy.</p></div>
+<div class="pp-metric"><strong>0.6%</strong><b>Shared SLK-581</b><p>AIHW reported this proportion among about 440,000 residential aged-care residents.</p></div>
+</div>
+<div class="pp-note"><b>Important:</b> these are results from particular datasets and linkage methods, not a guarantee for every future linkage. Results depend on data quality and completeness.<br><br>
+Sources:
+<a href="https://www.aihw.gov.au/reports/aged-care/comparing-an-slk-based-and-a-name-based-data-linka/contents/summary" target="_blank" rel="noopener">AIHW evaluation</a> ·
+<a href="https://www.aihw.gov.au/getmedia/875673aa-2eba-48f2-a9d6-6a9ffebdcffc/aihw-aodts-nmds-slk-581-guide-for-use-2023-24_2.pdf" target="_blank" rel="noopener">AIHW SLK-581 Guide</a> ·
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7856707/" target="_blank" rel="noopener">Peer-reviewed registry study</a>
+</div>
+<div class="pp-warning">SLK-581 is a statistical linkage key, not a guarantee of identity. It can produce missed or incorrect matches. Appropriate linkage projects use governance, validation and, where necessary, additional variables.</div>
+</div>
+</div></div></div>
+</section>
+
+<section class="resources-section" id="resources">
+  <div class="resources-container">
+    <div class="resources-intro">
+      <p class="section-eyebrow">For researchers</p>
+      <h2 class="section-title">Resources for Researchers</h2>
+      <div class="section-accent" aria-hidden="true"></div>
+      <p class="section-lede">Guidance and reference material for researchers who want to use My Health Passport Numbers (SLK-581 keys) in their own studies and survey tools.</p>
+    </div>
+
+    <div class="resource-card">
+      <div class="resource-icon">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+      </div>
+      <div class="resource-body">
+        <h3>Setting up My Health Passport for research projects</h3>
+        <p>A guide for researchers on setting up the My Health Passport Portal for research projects, including how to pass a Passport Number (SLK-581 key) directly into a REDCap or Qualtrics survey.</p>
+        <a class="resource-link" href="guide.pdf" target="_blank" rel="noopener">
+          Download the guide (PDF)
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        </a>
       </div>
     </div>
   </div>
