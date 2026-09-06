@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock Your Survey — My Health Passport Portal</title>
+    <style>
+        :root {
+            --mhp-teal: #1e6b63;
+            --mhp-dark: #222b2a;
+            --mhp-gray: #5a6563;
+            --redcap-red: #a91212;
+            --qualtrics-red: #e31b23;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --border-color: #e1e8e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--mhp-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            padding: 1.5rem 1rem;
+            box-sizing: border-box;
+        }
+
+        /* Top Logo Branding Header */
+        .top-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .phone-icon {
+            width: 32px;
+            height: 48px;
+            border: 2.5px solid var(--mhp-dark);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .phone-icon::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 16px;
+            height: 2px;
+            background-color: var(--mhp-dark);
+            border-radius: 1px;
+        }
+
+        .shield-icon {
+            width: 18px;
+            height: 20px;
+            background-color: var(--mhp-teal);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shield-user {
+            width: 8px;
+            height: 8px;
+            border: 1.5px solid white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-text .title-top {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--mhp-dark);
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        .brand-text .title-bottom {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--mhp-teal);
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 0 1.5rem 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--mhp-dark);
+            text-align: center;
+        }
+
+        .unlock-svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--mhp-dark);
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        /* Generate-section heading, styled to sit inside the card */
+        .gen-heading {
+            text-align: center;
+            margin: 0 0 0.35rem;
+        }
+
+        .gen-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--mhp-teal);
+            margin: 0 0 0.35rem;
+        }
+
+        .gen-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--mhp-dark);
+            margin: 0 0 0.6rem;
+        }
+
+        .gen-lede {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--mhp-gray);
+            text-align: center;
+            margin: 0 0 1.4rem;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: #fff;
+            border: 2.5px solid var(--mhp-teal);
+            border-radius: 20px;
+            padding: 8px 20px 8px 8px;
+            margin: 0 0 1.2rem;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .step-row.step-action {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .step-row.step-action:hover {
+            background: #EAF3F2;
+        }
+
+        .step-row.step-action:active {
+            transform: scale(0.99);
+        }
+
+        .step-circle {
+            width: 58px;
+            height: 58px;
+            flex: none;
+            border-radius: 50%;
+            background: var(--mhp-teal);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .step-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--mhp-teal);
+            margin: 0;
+        }
+
+        .info-toggle {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0 0 auto;
+            width: auto;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: none;
+        }
+
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            flex: none;
+            stroke: var(--mhp-teal);
+            fill: none;
+        }
+
+        .step-icon {
+            width: 18px;
+            height: 18px;
+            flex: none;
+            stroke: #ffffff;
+            fill: none;
+        }
+
+        .forward-badge {
+            width: 32px;
+            height: 32px;
+            flex: none;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .forward-badge.active {
+            background: var(--mhp-teal);
+            animation: forwardPulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes forwardPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(30, 107, 99, 0.55);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 7px rgba(30, 107, 99, 0);
+                transform: scale(1.08);
+            }
+        }
+
+        .progress-tick {
+            margin-left: auto;
+            flex: none;
+            width: 38px;
+            height: 38px;
+        }
+
+        .progress-tick svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .progress-tick .glow {
+            filter: drop-shadow(0 0 6px var(--mhp-teal));
+        }
+
+        .info-text {
+            margin: 0 0 1.2rem;
+            padding: 0.7rem 1rem;
+            background: #EAF3F2;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--mhp-dark);
+            text-align: left;
+        }
+
+        .field-group {
+            margin-bottom: 1rem;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--mhp-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .required-mark {
+            color: var(--mhp-teal);
+        }
+
+        .required-note {
+            font-style: italic;
+            font-size: 0.72rem;
+            color: var(--mhp-gray);
+            margin: 0.3rem 0 0;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 0.7rem 0.85rem;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--mhp-dark);
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--mhp-teal);
+        }
+
+        /* Distinct, uppercase treatment reserved for the generated code itself */
+        input.code-display {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--bg-color);
+            color: var(--mhp-teal);
+        }
+
+        .dob-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.3fr;
+            gap: 8px;
+        }
+
+        .passport-output {
+            margin: 1.4rem 0 0.5rem;
+            padding-top: 1.2rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .passport-output-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .passport-output-row input.code-display {
+            margin-bottom: 0;
+        }
+
+        /* ---- Hashed barcode stage (adapted from index(5).html) ---- */
+        .hash-stage {
+            margin: 0.4rem 0 1.4rem;
+        }
+
+        .hash-stage-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--mhp-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .hash-stage-sub {
+            font-size: 0.75rem;
+            color: var(--mhp-gray);
+            line-height: 1.45;
+            margin: 0 0 0.7rem;
+        }
+
+        .passport-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            background: #ffffff;
+            display: none;
+        }
+
+        .digital-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .data-block {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: calc(100% - 46px);
+        }
+
+        .barcode-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            height: 22px;
+            width: 100%;
+            padding: 0 2px;
+            box-sizing: border-box;
+        }
+
+        .barcode-line {
+            background-color: var(--mhp-teal);
+            border-radius: 0 0 1px 1px;
+        }
+
+        .hash-string {
+            background-color: var(--bg-color);
+            padding: 7px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10.5px;
+            color: var(--mhp-dark);
+            font-weight: bold;
+            word-break: break-all;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            letter-spacing: 0.2px;
+            text-align: left;
+        }
+
+        button.copy-icon-btn {
+            background-color: transparent;
+            color: var(--mhp-teal);
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            padding: 0;
+            margin: 0;
+        }
+
+        button.copy-icon-btn:hover {
+            background-color: rgba(30, 107, 99, 0.06);
+            border-color: var(--mhp-teal);
+        }
+
+        button.copy-icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--mhp-teal);
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            line-height: 1.4;
+            margin-top: 0.5rem;
+        }
+
+        button strong {
+            font-weight: 800;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        button:hover {
+            background-color: #17544e;
+        }
+
+        .disclaimer-text {
+            font-size: 0.75rem;
+            color: var(--mhp-gray);
+            text-align: center;
+            margin-top: 0.85rem;
+            margin-bottom: 0;
+            line-height: 1.35;
+        }
+
+        /* Branding Footer Grid Styles */
+        .branding-footer {
+            margin-top: 1.75rem;
+            padding-top: 0.5rem;
+        }
+
+        .footer-grid {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-caption {
+            font-size: 0.75rem;
+            color: var(--mhp-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 36px;
+        }
+
+        /* Custom REDCap Icon Styling */
+        .redcap-icon {
+            width: 22px;
+            height: 22px;
+            background-color: var(--redcap-red);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .redcap-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: white;
+        }
+
+        .redcap-text {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--redcap-red);
+            letter-spacing: 0.5px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Custom Qualtrics Icon Styling */
+        .qualtrics-icon {
+            width: 22px;
+            height: 22px;
+            background-color: var(--qualtrics-red);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .qualtrics-icon span {
+            color: white;
+            font-weight: 900;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            line-height: 1;
+        }
+
+        .qualtrics-text {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--mhp-dark);
+            letter-spacing: 0.3px;
+            font-family: Arial, sans-serif;
+        }
+
+        .footer-divider {
+            width: 1px;
+            height: 48px;
+            background-color: var(--border-color);
+            margin-top: 0.25rem;
+        }
+
+        .footer-tagline {
+            font-size: 0.75rem;
+            color: var(--mhp-gray);
+            margin-top: 1.25rem;
+            text-align: center;
+        }
+
+        .footer-tagline strong {
+            color: var(--mhp-teal);
+        }
+
+        /* External Main Site Link Footer */
+        .main-site-link {
+            margin-top: 1.25rem;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .main-site-link a {
+            color: var(--mhp-teal);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+
+        .main-site-link a:hover {
+            color: #17544e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Main Logo Header with 'PORTAL' appended -->
+        <a class="top-brand" href="https://martindutch76.github.io/My-Health-Passport/" style="text-decoration:none;">
+            <div class="phone-icon">
+                <div class="shield-icon">
+                    <div class="shield-user"></div>
+                </div>
+            </div>
+            <div style="height: 32px; width: 1px; background-color: #ccc; margin: 0 4px;"></div>
+            <div class="brand-text">
+                <span class="title-top">MY HEALTH</span>
+                <span class="title-bottom">PASSPORT PORTAL</span>
+            </div>
+        </a>
+
+        <div class="card">
+            <!-- Title with Unlock Icon -->
+            <h1 class="header-title">
+                <svg class="unlock-svg" viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                </svg>
+                Unlock Your Survey
+            </h1>
+
+            <!-- Step 1: Generate -->
+            <div class="step-row">
+                <div class="step-circle">1</div>
+                <p class="step-text">
+                    Enter Your Details
+                    <button type="button" class="info-toggle" id="infoToggle" aria-expanded="false" aria-controls="infoText" title="Why am I being asked to do this?">
+                        <svg class="info-icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M12 11v5.5"/>
+                            <circle cx="12" cy="7.8" r="0.15" fill="var(--mhp-teal)" stroke="var(--mhp-teal)"/>
+                        </svg>
+                    </button>
+                </p>
+
+                <div class="progress-tick" aria-hidden="true">
+                    <svg viewBox="0 0 100 100">
+                        <!-- Always-visible grey outline -->
+                        <g>
+                            <circle cx="50" cy="50" r="45" fill="var(--border-color)" />
+                            <path d="M30 52 L45 67 L72 38"
+                                  stroke="#ffffff"
+                                  stroke-width="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  fill="none" />
+                        </g>
+
+                        <defs>
+                            <clipPath id="revealMask">
+                                <path id="maskArc" d="" />
+                            </clipPath>
+                        </defs>
+
+                        <!-- Teal tick, progressively revealed -->
+                        <g id="tickGroup" clip-path="url(#revealMask)">
+                            <circle cx="50" cy="50" r="45" fill="var(--mhp-teal)" />
+                            <path d="M30 52 L45 67 L72 38"
+                                  stroke="white"
+                                  stroke-width="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  fill="none" />
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <p id="infoText" class="info-text" hidden>Your researcher wants to keep your identity anonymised to them, while still recognising you each time you interact with them. This page generates a unique ID for you from your name, date of birth and gender, and shares only that ID with the researcher.</p>
+
+            <p class="gen-lede">Fill in each field below. Nothing you enter here is sent anywhere — only the finished Passport Number is ever shared.</p>
+
+            <form id="genForm" autocomplete="off">
+                <div class="field-group">
+                    <label class="field-label" for="surname">Family name <span class="required-mark">*</span></label>
+                    <input type="text" id="surname" placeholder="e.g. O'Brien-Smith">
+                    <p class="required-note"><span class="required-mark">*</span>This field is compulsory</p>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="givenname">First given name <span class="required-mark">*</span></label>
+                    <input type="text" id="givenname" placeholder="e.g. Elizabeth">
+                    <p class="required-note"><span class="required-mark">*</span>This field is compulsory</p>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Date of birth <span class="required-mark">*</span></label>
+                    <div class="dob-row">
+                        <select id="day" aria-label="Day"></select>
+                        <select id="month" aria-label="Month"></select>
+                        <input type="text" id="year" inputmode="numeric" maxlength="4" placeholder="YYYY">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="sex">Sex <span class="required-mark">*</span></label>
+                    <select id="sex">
+                        <option value="">Select…</option>
+                        <option value="1">Male</option>
+                        <option value="2">Female</option>
+                        <option value="3">Intersex or indeterminate</option>
+                        <option value="9">Not stated</option>
+                    </select>
+                </div>
+            </form>
+
+            <div class="step-row">
+                <div class="step-circle">2</div>
+                <p class="step-text">Get your Unique ID</p>
+
+                <div class="progress-tick" aria-hidden="true">
+                    <svg viewBox="0 0 100 100">
+                        <!-- Always-visible grey outline -->
+                        <g>
+                            <circle cx="50" cy="50" r="45" fill="var(--border-color)" />
+                            <path d="M30 52 L45 67 L72 38"
+                                  stroke="#ffffff"
+                                  stroke-width="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  fill="none" />
+                        </g>
+
+                        <defs>
+                            <clipPath id="revealMask2">
+                                <path id="maskArc2" d="" />
+                            </clipPath>
+                        </defs>
+
+                        <!-- Teal tick, lit once the ID has been generated -->
+                        <g id="tickGroup2" clip-path="url(#revealMask2)">
+                            <circle cx="50" cy="50" r="45" fill="var(--mhp-teal)" />
+                            <path d="M30 52 L45 67 L72 38"
+                                  stroke="white"
+                                  stroke-width="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  fill="none" />
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="passport-output" id="passportOutputBlock">
+                <label class="field-label" for="passportNumber">Your Anonymised My Health Passport Number</label>
+                <div class="passport-output-row">
+                    <input type="text" id="passportNumber" class="code-display" value="" placeholder="Fill in the fields above" readonly>
+                    <button class="copy-icon-btn" type="button" id="copyPassportBtn" title="Copy to clipboard">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hash-stage" id="hashStageBlock">
+                <label class="hash-stage-label">Your Anonymised My Health Passport Barcode</label>
+
+                <div id="passportCard" class="passport-card">
+                    <div class="digital-wrapper">
+                        <div class="data-block">
+                            <div id="barcode" class="barcode-container"></div>
+                            <div id="hashOutput" class="hash-string"></div>
+                        </div>
+
+                        <button class="copy-icon-btn" type="button" id="copyHashBtn" title="Copy to clipboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Share (merged with the action button) -->
+            <button type="button" class="step-row step-action" id="share-btn">
+                <span class="step-circle">3</span>
+                <span class="step-text">
+                    <span id="shareLabelText">Share your <strong>My Health Passport Number</strong></span>
+                    <span class="forward-badge" id="forwardBadge">
+                        <svg class="step-icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4v7a4 4 0 0 0 4 4h12"/>
+                            <path d="M15 10l5 5-5 5"/>
+                        </svg>
+                    </span>
+                </span>
+            </button>
+
+            <!-- Small Privacy Disclaimer -->
+            <p class="disclaimer-text">
+                Selected letters from your first and last names, as well as your date of birth and encoded gender, are used to generate your unique identifier. You consent to share your unique identifier with the researchers conducting the survey. <span id="disclaimerVariable">Your first name or last name in whole will not be shared.</span>
+            </p>
+        </div>
+
+        <!-- Corporate Branding Footer -->
+        <div class="branding-footer">
+            <div class="footer-grid">
+
+                <!-- Powered By Column -->
+                <div class="footer-col">
+                    <div class="footer-caption">Powered by</div>
+                    <a class="footer-logo" href="https://martindutch76.github.io/My-Health-Passport/" style="text-decoration:none;">
+                        <div class="phone-icon" style="width: 22px; height: 32px; border-width: 2px;">
+                            <div class="shield-icon" style="width: 12px; height: 13px;"></div>
+                        </div>
+                        <div class="brand-text" style="text-align: left;">
+                            <span class="title-top" style="font-size: 0.78rem;">MY HEALTH</span>
+                            <span class="title-bottom" style="font-size: 0.78rem;">PASSPORT</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="footer-divider"></div>
+
+                <!-- Compatible With Column -->
+                <div class="footer-col">
+                    <div class="footer-caption">Compatible with</div>
+                    <div class="footer-logo">
+                        <!-- REDCap Badge -->
+                        <div class="redcap-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 5.58 2 10c0 2.22 1.15 4.23 3 5.61V19c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-1.12c.94.21 1.94.32 3 .32s2.06-.11 3-.32V19c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-3.39c1.85-1.38 3-3.39 3-5.61 0-4.42-4.48-8-10-8z"/>
+                            </svg>
+                        </div>
+                        <span class="redcap-text" style="margin-right: 8px;">REDCap</span>
+
+                        <!-- Qualtrics Badge -->
+                        <div class="qualtrics-icon">
+                            <span>Q</span>
+                        </div>
+                        <span class="qualtrics-text">qualtrics</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-tagline">
+                Your health research identity. <strong>Your choice.</strong>
+            </div>
+
+            <!-- Main Website Link -->
+            <div class="main-site-link">
+                <a href="https://martindutch76.github.io/My-Health-Passport/" target="_blank" rel="noopener noreferrer">
+                    Visit Main My Health Passport Website &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- URL parameters (read first so they can control layout immediately) ----------
+        const urlParams = new URLSearchParams(window.location.search);
+        const siteTitle = urlParams.get('siteTitle');
+        const siteUrl = urlParams.get('siteUrl');
+        const barcodeMode = (urlParams.get('barcode') || '').trim().toLowerCase() === 'true';
+
+        // Show only the section relevant to the mode this link was built for
+        const passportOutputBlock = document.getElementById('passportOutputBlock');
+        const hashStageBlock = document.getElementById('hashStageBlock');
+        if (barcodeMode) {
+            passportOutputBlock.hidden = true;
+        } else {
+            hashStageBlock.hidden = true;
+        }
+
+        // Info note: text only shows once the icon is clicked
+        const infoToggle = document.getElementById('infoToggle');
+        const infoText = document.getElementById('infoText');
+        infoToggle.addEventListener('click', () => {
+            const isHidden = infoText.hidden;
+            infoText.hidden = !isHidden;
+            infoToggle.setAttribute('aria-expanded', String(isHidden));
+        });
+
+        // ---------- SLK-581 generation (mirrors the main site's generator) ----------
+        const surnameInput = document.getElementById('surname');
+        const givenInput = document.getElementById('givenname');
+        const daySelect = document.getElementById('day');
+        const monthSelect = document.getElementById('month');
+        const yearInput = document.getElementById('year');
+        const sexSelect = document.getElementById('sex');
+        const passportNumber = document.getElementById('passportNumber');
+        const passportCard = document.getElementById('passportCard');
+        const barcodeContainer = document.getElementById('barcode');
+        const hashOutput = document.getElementById('hashOutput');
+        const copyHashBtn = document.getElementById('copyHashBtn');
+        const copyPassportBtn = document.getElementById('copyPassportBtn');
+        const maskArc = document.getElementById('maskArc');
+        const tickGroup = document.getElementById('tickGroup');
+        const maskArc2 = document.getElementById('maskArc2');
+        const tickGroup2 = document.getElementById('tickGroup2');
+        const forwardBadge = document.getElementById('forwardBadge');
+
+        for (let d = 1; d <= 31; d++) {
+            const opt = document.createElement('option');
+            opt.value = String(d).padStart(2, '0');
+            opt.textContent = d;
+            daySelect.appendChild(opt);
+        }
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        monthNames.forEach((name, i) => {
+            const opt = document.createElement('option');
+            opt.value = String(i + 1).padStart(2, '0');
+            opt.textContent = name;
+            monthSelect.appendChild(opt);
+        });
+        const blankFirst = (sel) => {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '—';
+            sel.insertBefore(opt, sel.firstChild);
+            sel.value = '';
+        };
+        blankFirst(daySelect);
+        blankFirst(monthSelect);
+
+        function extractLetters(raw, positions) {
+            const alphaOnly = (raw || '').toUpperCase().replace(/[^A-Z]/g, '');
+            return positions.map(p => alphaOnly[p - 1] || null);
+        }
+
+        // ---------- Progress tick (adapted from tick.html, tuned to the page's teal) ----------
+        function polarToCartesian(cx, cy, r, angleDeg) {
+            const rad = (angleDeg - 90) * Math.PI / 180;
+            return {
+                x: cx + r * Math.cos(rad),
+                y: cy + r * Math.sin(rad)
+            };
+        }
+
+        function describeArc(cx, cy, r, endAngle) {
+            const start = polarToCartesian(cx, cy, r, 0);
+            const end = polarToCartesian(cx, cy, r, endAngle);
+            const largeArc = endAngle > 180 ? 1 : 0;
+            return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y} Z`;
+        }
+
+        function updateProgressTick(maskArcEl, tickGroupEl, filledCount, totalCount) {
+            const progressAngle = (filledCount / totalCount) * 360;
+
+            if (progressAngle >= 360) {
+                maskArcEl.setAttribute('d', 'M 50 0 A 50 50 0 1 1 49.999 0 Z');
+                tickGroupEl.classList.add('glow');
+            } else {
+                maskArcEl.setAttribute('d', progressAngle > 0 ? describeArc(50, 50, 50, progressAngle) : '');
+                tickGroupEl.classList.remove('glow');
+            }
+        }
+
+        // ---------- SHA-256 hashing + barcode rendering (adapted from index(5).html) ----------
+        let currentHashValue = '';
+
+        async function updateHashDisplay(text) {
+            if (!text) {
+                currentHashValue = '';
+                passportCard.style.display = 'none';
+                barcodeContainer.innerHTML = '';
+                hashOutput.textContent = '';
+                return;
+            }
+
+            const msgBuffer = new TextEncoder().encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+            barcodeContainer.innerHTML = '';
+            for (let i = 0; i < hashHex.length; i++) {
+                const charCode = hashHex.charCodeAt(i);
+                const width = (charCode % 2 === 0) ? 2.5 : 1.2;
+                const height = 8 + (charCode % 13);
+
+                const line = document.createElement('div');
+                line.className = 'barcode-line';
+                line.style.width = `${width}px`;
+                line.style.height = `${height}px`;
+                barcodeContainer.appendChild(line);
+            }
+
+            currentHashValue = hashHex;
+            hashOutput.textContent = hashHex;
+            passportCard.style.display = 'block';
+        }
+
+        copyHashBtn.addEventListener('click', () => {
+            const hashText = hashOutput.textContent;
+            if (hashText) {
+                navigator.clipboard.writeText(hashText);
+                alert('Hash copied to clipboard!');
+            }
+        });
+
+        copyPassportBtn.addEventListener('click', () => {
+            const passportText = passportNumber.value;
+            if (passportText) {
+                navigator.clipboard.writeText(passportText);
+                alert('Passport Number copied to clipboard!');
+            }
+        });
+
+        let currentPassportNumber = '';
+
+        function computePassportNumber() {
+            const hasSurnameInput = surnameInput.value.replace(/[^A-Za-z]/g, '').length > 0;
+            const surnameChars = hasSurnameInput
+                ? extractLetters(surnameInput.value, [2, 3, 5]).map(c => c || '2')
+                : [null, null, null];
+
+            const hasGivenInput = givenInput.value.replace(/[^A-Za-z]/g, '').length > 0;
+            const givenChars = hasGivenInput
+                ? extractLetters(givenInput.value, [2, 3]).map(c => c || '2')
+                : [null, null];
+
+            const day = daySelect.value || null;
+            const month = monthSelect.value || null;
+            let yearVal = yearInput.value.replace(/[^0-9]/g, '').slice(0, 4);
+            const year = yearVal.length === 4 ? yearVal : null;
+
+            const dobChars = [];
+            (day || '..').split('').forEach(c => dobChars.push(day ? c : null));
+            (month || '..').split('').forEach(c => dobChars.push(month ? c : null));
+            (year || '....').split('').forEach(c => dobChars.push(year ? c : null));
+
+            const sexChar = sexSelect.value || null;
+
+            const fieldStates = [hasSurnameInput, hasGivenInput, !!day, !!month, !!year, !!sexChar];
+            const filledCount = fieldStates.filter(Boolean).length;
+            updateProgressTick(maskArc, tickGroup, filledCount, fieldStates.length);
+
+            const allChars = [...surnameChars, ...givenChars, ...dobChars, sexChar];
+            const complete = allChars.every(c => c);
+
+            updateProgressTick(maskArc2, tickGroup2, complete ? 1 : 0, 1);
+            forwardBadge.classList.toggle('active', complete);
+
+            if (complete) {
+                currentPassportNumber = allChars.join('');
+                passportNumber.value = currentPassportNumber;
+            } else {
+                currentPassportNumber = '';
+                passportNumber.value = '';
+            }
+
+            updateHashDisplay(currentPassportNumber);
+        }
+
+        [surnameInput, givenInput, daySelect, monthSelect, yearInput, sexSelect].forEach(el => {
+            el.addEventListener('input', computePassportNumber);
+            el.addEventListener('change', computePassportNumber);
+        });
+
+        // ---------- Preserved: URL parameter handling for site title / redirect ----------
+        const shareBtn = document.getElementById('share-btn');
+        const shareLabelText = document.getElementById('shareLabelText');
+        const disclaimerVariable = document.getElementById('disclaimerVariable');
+
+        // Inject site name into the button's label (leaving the circle and icon untouched)
+        const shareLabel = barcodeMode ? 'My Health Passport Barcode' : 'My Health Passport Number';
+        if (siteTitle && siteTitle.trim()) {
+            shareLabelText.innerHTML = `Share your ${shareLabel}<br>with <strong>${siteTitle.trim()}</strong>`;
+        } else {
+            shareLabelText.innerHTML = `Share your <strong>${shareLabel}</strong>`;
+        }
+
+        // Swap the disclaimer's closing sentence when sharing the barcode instead of the raw number
+        if (barcodeMode && disclaimerVariable) {
+            disclaimerVariable.textContent = 'Your personal identifying data has been irreversibly encrypted.';
+        }
+
+        // Format Base URL in memory for redirection logic
+        let formattedBaseUrl = '';
+        if (siteUrl) {
+            formattedBaseUrl = siteUrl.trim();
+            if (!/^https?:\/\//i.test(formattedBaseUrl)) {
+                formattedBaseUrl = 'https://' + formattedBaseUrl;
+            }
+        }
+
+        // Safe URL builder — appends either ?slk= (raw number) or ?barcode= (SHA-256 hash)
+        function constructTargetUrl(baseUrl, paramName, paramValue) {
+            if (!baseUrl || !paramValue) return '';
+
+            try {
+                const parsedUrl = new URL(baseUrl);
+                parsedUrl.searchParams.set(paramName, paramValue);
+                return parsedUrl.href;
+            } catch (err) {
+                const joiner = baseUrl.includes('?') ? '&' : '?';
+                return baseUrl + joiner + paramName + '=' + encodeURIComponent(paramValue);
+            }
+        }
+
+        // Button click action
+        shareBtn.addEventListener('click', () => {
+            computePassportNumber();
+
+            if (!formattedBaseUrl) {
+                alert('No valid base website URL was provided in parameters.');
+                return;
+            }
+
+            if (!currentPassportNumber) {
+                alert('Please complete all fields above to generate your Passport Number before sharing.');
+                return;
+            }
+
+            const targetUrl = barcodeMode
+                ? constructTargetUrl(formattedBaseUrl, 'barcode', currentHashValue)
+                : constructTargetUrl(formattedBaseUrl, 'slk', currentPassportNumber);
+
+            if (targetUrl) {
+                window.open(targetUrl, '_blank', 'noopener,noreferrer');
+            }
+        });
+
+        // Initialise the progress ticks at 0 on load
+        updateProgressTick(maskArc, tickGroup, 0, 6);
+        updateProgressTick(maskArc2, tickGroup2, 0, 1);
+    </script>
+
+</body>
+</html>
