@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Link Generator — My Health Passport</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EDF2F0;
+    --surface: #FBFCFB;
+    --ink: #1E2A27;
+    --muted: #5B6B67;
+    --line: #C6D1CD;
+    --line-soft: #DCE4E1;
+    --teal: #1B6E68;
+    --teal-dark: #144F4B;
+    --amber: #C07A22;
+    --amber-soft: #F2DFC0;
+    --err: #A6402F;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  /* ---- Site header (shared brand lockup) ---- */
+  .site-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .site-header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-icon { width: 48px; height: 48px; flex: none; }
+
+  .brand-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--line);
+    flex: none;
+  }
+
+  .brand-text { display: flex; flex-direction: column; }
+
+  .brand-name {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .brand-name .line1 { color: var(--ink); display: block; }
+  .brand-name .line2 { color: var(--teal); display: block; }
+
+  .brand-tagline { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .brand-tagline .accent { color: var(--teal); font-weight: 600; }
+
+  .header-badge {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    background: var(--amber-soft);
+    border: 1px solid var(--amber);
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 620px) {
+    .brand-tagline { display: none; }
+    .site-header-inner { padding: 14px 16px; }
+  }
+
+  /* ---- Page layout ---- */
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  .page-intro { max-width: 640px; margin-bottom: 36px; }
+
+  .section-eyebrow {
+    margin: 0 0 14px;
+    color: var(--teal-dark);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .page-title {
+    margin: 0;
+    font-size: clamp(28px, 4vw, 36px);
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .section-accent {
+    width: 56px;
+    height: 4px;
+    margin: 20px 0;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+
+  .page-lede {
+    margin: 0;
+    max-width: 60ch;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px;
+    margin-bottom: 20px;
+  }
+
+  .panel-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+    margin: 0 0 14px;
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  label:first-of-type { margin-top: 0; }
+
+  .radio-group { margin-top: 8px; }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .radio-option input[type="radio"] {
+    accent-color: var(--teal);
+    width: 17px;
+    height: 17px;
+    flex: none;
+    cursor: pointer;
+  }
+
+  .radio-option label {
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus { border-color: var(--teal); }
+
+  #urlStatus { font-size: 18px; margin-left: 10px; }
+  .valid { color: var(--teal); }
+  .invalid { color: var(--err); }
+
+  #urlError {
+    color: var(--err);
+    font-size: 12.5px;
+    margin-top: 6px;
+  }
+
+  /* ---- Link output (matches the key/hash display pattern elsewhere) ---- */
+  .full-key-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .full-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    word-break: break-all;
+    color: var(--ink);
+    flex: 1;
+    min-width: 200px;
+  }
+  .full-key.empty { color: var(--muted); font-style: italic; font-family: 'Public Sans', sans-serif; font-size: 14px; }
+
+  button.copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    background: transparent;
+    color: var(--teal-dark);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  button.copy svg { width: 16px; height: 16px; }
+  button.copy:hover { background: #F1F7F6; border-color: var(--teal); }
+  button.copy:active { transform: scale(0.96); }
+
+  /* ---- Buttons ---- */
+  .cta-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--teal);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .cta-pill:hover { background: var(--teal-dark); }
+  .cta-pill svg { width: 16px; height: 16px; }
+
+  .cta-pill.secondary {
+    background: #fff;
+    color: var(--teal-dark);
+    border: 1.5px solid var(--teal);
+  }
+  .cta-pill.secondary:hover { background: #F1F7F6; }
+
+  .qr-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  /* ---- QR panel ---- */
+  #qrPanel {
+    margin-top: 20px;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-align: center;
+    display: none;
+  }
+
+  #qrPanel img {
+    width: 220px;
+    max-width: 100%;
+    margin-bottom: 4px;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+  }
+
+  .footer {
+    text-align: center;
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 600px) {
+    #outputContainer, .full-key-row { flex-direction: column; align-items: stretch; }
+    button.copy { width: 100%; height: 40px; }
+  }
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 8.5C11 7.12 12.12 6 13.5 6H31C32.66 6 34 7.34 34 9V38C34 39.1 33.1 40 32 40H14.5C12.57 40 11 38.43 11 36.5V8.5Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M11 34.5C11 33.12 12.12 32 13.5 32H34V36.5C34 38.43 32.43 40 30.5 40H13.5C12.12 40 11 38.88 11 37.5V34.5Z" fill="var(--ink)" fill-opacity="0.06" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M22.5 13L28.5 15.1V19.3C28.5 23 26 25.9 22.5 27C19 25.9 16.5 23 16.5 19.3V15.1L22.5 13Z" fill="var(--teal)"/>
+        <circle cx="22.5" cy="18.3" r="1.9" fill="#fff"/>
+        <path d="M19.3 22.5C19.3 20.6 20.7 19.6 22.5 19.6C24.3 19.6 25.7 20.6 25.7 22.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-divider"></div>
+      <div class="brand-text">
+        <span class="brand-name"><span class="line1">My Health</span><span class="line2">Passport</span></span>
+        <span class="brand-tagline">Your health research identity. <span class="accent">Your choice.</span></span>
+      </div>
+    </div>
+    <span class="header-badge">For Researchers</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <header class="page-intro">
+    <p class="section-eyebrow">For researchers</p>
+    <h1 class="page-title">Portal Link Generator</h1>
+    <div class="section-accent" aria-hidden="true"></div>
+    <p class="page-lede">Create specialised links for your research project. These links send participants to a landing page where they can confirm or generate their My Health Passport Number or Barcode, supporting secure identity linkage for web surveys, SMS invitations, or email-based study contact — no first or last names collected. Turn any link into a QR code or short URL using your usual tools.</p>
+  </header>
+
+  <div class="panel">
+    <span class="panel-label">Link type</span>
+    <label>I want to create a link for:</label>
+    <div class="radio-group">
+      <div class="radio-option"><input type="radio" name="linkType" value="survey" id="lt-survey" checked><label for="lt-survey">Online Survey (e.g. REDCap or Qualtrics)</label></div>
+      <div class="radio-option"><input type="radio" name="linkType" value="sms" id="lt-sms"><label for="lt-sms">An SMS phone message</label></div>
+      <div class="radio-option"><input type="radio" name="linkType" value="email" id="lt-email"><label for="lt-email">An Email</label></div>
+    </div>
+
+    <div id="surveyNameBlock">
+      <label for="surveyName">Enter the name of your survey</label>
+      <input type="text" id="surveyName" placeholder="Sky Colour Survey">
+    </div>
+
+    <div id="surveyUrlBlock">
+      <label for="surveyUrl">Enter your survey's URL</label>
+      <div style="display:flex; align-items:center;">
+        <input type="text" id="surveyUrl" placeholder="https://example.com/surveys/?s=XXXXXX" style="flex:1;">
+        <span id="urlStatus"></span>
+      </div>
+      <div id="urlError"></div>
+    </div>
+
+    <div id="phoneBlock" style="display:none;">
+      <label for="phoneNumber">Enter your mobile phone number</label>
+      <input type="text" id="phoneNumber" placeholder="+61 4XX XXX XXX">
+    </div>
+
+    <div id="emailBlock" style="display:none;">
+      <label for="replyEmail">Enter your reply email address</label>
+      <input type="text" id="replyEmail" placeholder="example@domain.com">
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="panel-label">Identifier type</span>
+    <label>Choose the identifier type:</label>
+    <div class="radio-group">
+      <div class="radio-option"><input type="radio" name="mode" value="false" id="id-number" checked><label for="id-number">My Health Passport Number (SLK-581)</label></div>
+      <div class="radio-option"><input type="radio" name="mode" value="true" id="id-barcode"><label for="id-barcode">My Health Passport Barcode (SHA-256)</label></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="panel-label">Your link</span>
+    <div class="full-key-row" id="outputContainer">
+      <div id="output" class="full-key empty">Fill in the details above to generate your link</div>
+      <button id="copyBtn" class="copy" title="Copy link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="panel" style="text-align:center;">
+    <span class="panel-label" style="text-align:left; display:block;">QR code</span>
+    <button id="qrBtn" class="cta-pill secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM21 14v3M17 21h4"/></svg>
+      Generate QR Code
+    </button>
+
+    <div id="qrPanel">
+      <img id="qrImage" src="" alt="QR Code">
+      <div class="qr-actions">
+        <button id="copyQRBtn" class="cta-pill secondary">Copy QR Code Image</button>
+        <button id="downloadQRBtn" class="cta-pill secondary">Download QR Code</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Your health research identity. <strong style="color:var(--teal);">Your choice.</strong><br>
+  © My Health Passport – Melbourne Health
+</div>
+
+<script>
+  const linkTypeRadios = document.getElementsByName("linkType");
+
+  const surveyNameBlock = document.getElementById("surveyNameBlock");
+  const surveyUrlBlock = document.getElementById("surveyUrlBlock");
+  const phoneBlock = document.getElementById("phoneBlock");
+  const emailBlock = document.getElementById("emailBlock");
+
+  const surveyName = document.getElementById("surveyName");
+  const surveyUrl = document.getElementById("surveyUrl");
+  const phoneNumber = document.getElementById("phoneNumber");
+  const replyEmail = document.getElementById("replyEmail");
+
+  const urlStatus = document.getElementById("urlStatus");
+  const urlError = document.getElementById("urlError");
+  const output = document.getElementById("output");
+  const copyBtn = document.getElementById("copyBtn");
+  const idRadios = document.getElementsByName("mode");
+
+  const qrBtn = document.getElementById("qrBtn");
+  const qrPanel = document.getElementById("qrPanel");
+  const qrImage = document.getElementById("qrImage");
+  const copyQRBtn = document.getElementById("copyQRBtn");
+  const downloadQRBtn = document.getElementById("downloadQRBtn");
+
+  const placeholderText = "Fill in the details above to generate your link";
+
+  function updateVisibility() {
+    const type = [...linkTypeRadios].find(r => r.checked).value;
+
+    surveyNameBlock.style.display = "block";
+    surveyUrlBlock.style.display = (type === "survey") ? "block" : "none";
+    phoneBlock.style.display = (type === "sms") ? "block" : "none";
+    emailBlock.style.display = (type === "email") ? "block" : "none";
+
+    buildLink();
+  }
+
+  function validateUrlLive() {
+    const url = surveyUrl.value.trim();
+
+    if (!url) {
+      urlStatus.textContent = "";
+      urlStatus.className = "";
+      urlError.textContent = "";
+      return;
+    }
+
+    if (!url.startsWith("https://")) {
+      urlStatus.textContent = "✗";
+      urlStatus.className = "invalid";
+      urlError.textContent = "Your survey URL must begin with https://";
+      return;
+    }
+
+    try {
+      new URL(url);
+      urlStatus.textContent = "✓";
+      urlStatus.className = "valid";
+      urlError.textContent = "";
+    } catch {
+      urlStatus.textContent = "✗";
+      urlStatus.className = "invalid";
+      urlError.textContent = "This URL is not a valid format.";
+    }
+  }
+
+  function setOutput(text) {
+    if (!text) {
+      output.textContent = placeholderText;
+      output.classList.add("empty");
+    } else {
+      output.textContent = text;
+      output.classList.remove("empty");
+    }
+  }
+
+  function buildLink() {
+    const type = [...linkTypeRadios].find(r => r.checked).value;
+    const barcode = [...idRadios].find(r => r.checked).value;
+
+    let url = "";
+    let phone = "";
+    let email = "";
+
+    if (type === "survey") url = surveyUrl.value.trim();
+    if (type === "sms") phone = phoneNumber.value.trim();
+    if (type === "email") email = replyEmail.value.trim();
+
+    if (type === "survey") {
+      const name = surveyName.value.trim();
+      if (!name || !url || urlError.textContent !== "") {
+        setOutput("");
+        return;
+      }
+      const encodedName = encodeURIComponent(name);
+
+      setOutput(
+        "https://martindutch76.github.io/My-Health-Passport/portal.html"
+        + "?siteTitle=" + encodedName
+        + "&siteUrl=" + url
+        + "&barcode=" + barcode
+        + "&linkType=survey"
+      );
+      return;
+    }
+
+    if (type === "sms") {
+      if (!phone) { setOutput(""); return; }
+      setOutput(
+        "https://martindutch76.github.io/My-Health-Passport/phone.html"
+        + "?SurveyPhone=" + encodeURIComponent(phone)
+        + "&barcode=" + barcode
+        + "&linkType=sms"
+      );
+      return;
+    }
+
+    if (type === "email") {
+      if (!email) { setOutput(""); return; }
+      setOutput(
+        "https://martindutch76.github.io/My-Health-Passport/phone.html"
+        + "?replyemail=" + encodeURIComponent(email)
+        + "&barcode=" + barcode
+        + "&linkType=email"
+      );
+      return;
+    }
+  }
+
+  surveyName.addEventListener("input", buildLink);
+  surveyUrl.addEventListener("input", () => { validateUrlLive(); buildLink(); });
+  phoneNumber.addEventListener("input", buildLink);
+  replyEmail.addEventListener("input", buildLink);
+
+  idRadios.forEach(r => r.addEventListener("change", buildLink));
+  linkTypeRadios.forEach(r => r.addEventListener("change", updateVisibility));
+
+  copyBtn.addEventListener("click", () => {
+    const text = output.textContent.trim();
+    if (!text || output.classList.contains("empty")) return;
+
+    navigator.clipboard.writeText(text).then(() => {
+      copyBtn.style.color = "var(--teal)";
+      setTimeout(() => { copyBtn.style.color = ""; }, 1200);
+    });
+  });
+
+  /* QR Code Generator */
+  qrBtn.addEventListener("click", () => {
+    const link = output.textContent.trim();
+    if (!link || output.classList.contains("empty")) return;
+
+    const qrUrl = "https://quickchart.io/qr?text=" + encodeURIComponent(link);
+
+    qrImage.src = qrUrl;
+    qrPanel.style.display = "block";
+  });
+
+  /* Copy QR Image */
+  copyQRBtn.addEventListener("click", async () => {
+    try {
+      const imgBlob = await fetch(qrImage.src).then(r => r.blob());
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": imgBlob })
+      ]);
+
+      copyQRBtn.textContent = "Copied ✓";
+      setTimeout(() => { copyQRBtn.textContent = "Copy QR Code Image"; }, 1200);
+    } catch (err) {
+      alert("Copy not supported in this browser.");
+    }
+  });
+
+  /* Download QR Image */
+  downloadQRBtn.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.href = qrImage.src;
+    link.download = "MyHealthPassport_QR.png";
+    link.click();
+  });
+
+  updateVisibility();
+</script>
+
+</body>
+</html>
