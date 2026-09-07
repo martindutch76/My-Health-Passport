@@ -217,6 +217,66 @@
     margin-top: 6px;
   }
 
+  /* ---- Auth gate ---- */
+  .auth-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px;
+    max-width: 420px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .auth-panel p.auth-lede {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 20px;
+  }
+
+  .auth-panel input[type="email"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .auth-panel input[type="email"]:focus { border-color: var(--teal); }
+
+  #authStatus {
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    display: none;
+    text-align: left;
+  }
+  #authStatus.info { background: #EEF2F1; color: var(--ink); display: block; }
+  #authStatus.success { background: #E6F4EA; color: var(--teal-dark); display: block; }
+  #authStatus.error { background: #FDECEA; color: var(--err); display: block; }
+
+  .account-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .account-bar strong { color: var(--ink); }
+  .account-bar a { color: var(--teal-dark); font-weight: 600; text-decoration: none; cursor: pointer; }
+  .account-bar a:hover { text-decoration: underline; }
+
   /* ---- Link output (matches the key/hash display pattern elsewhere) ---- */
   .full-key-row {
     display: flex;
@@ -357,7 +417,24 @@
     <p class="page-lede">Create specialised links for your research project. These links send participants to a landing page where they can confirm or generate their My Health Passport Number or Barcode, supporting secure identity linkage for web surveys, SMS invitations, or email-based study contact — no first or last names collected. Turn any link into a QR code or short URL using your usual tools.</p>
   </header>
 
-  <div class="panel">
+  <!-- Auth gate: shown when signed out -->
+  <div id="authGate" class="auth-panel">
+    <p class="panel-label" style="text-align:center;">Sign in to continue</p>
+    <p class="auth-lede">Log in with your email to build links tied to your researcher account. We'll send you a one-time login link — no password needed.</p>
+    <input type="email" id="authEmailInput" placeholder="you@example.com">
+    <button id="authSendBtn" class="cta-pill" style="width:100%;">Send me a login link</button>
+    <div id="authStatus"></div>
+  </div>
+
+  <!-- Account bar + tool: shown when signed in -->
+  <div id="toolContent" style="display:none;">
+
+    <div class="account-bar">
+      <span>Signed in as <strong id="acctEmail"></strong></span>
+      <a id="signOutLink">Sign out</a>
+    </div>
+
+    <div class="panel">
     <span class="panel-label">Link type</span>
     <label>I want to create a link for:</label>
     <div class="radio-group">
@@ -426,12 +503,126 @@
     </div>
   </div>
 
+  </div>
+
 </div>
 
 <div class="footer">
   Your health research identity. <strong style="color:var(--teal);">Your choice.</strong><br>
   © My Health Passport – Melbourne Health
 </div>
+
+<!-- Supabase client library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // ---------------------------------------------------------------
+  // Auth setup — same project as login-test.html
+  // ---------------------------------------------------------------
+  const SUPABASE_URL = 'https://hqyvrfftoajdhkccvqam.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_gulOoDgxHgWEVgXvCXojAg_E4Jq4xFY';
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentSession = null;
+
+  const authGate = document.getElementById('authGate');
+  const toolContent = document.getElementById('toolContent');
+  const authEmailInput = document.getElementById('authEmailInput');
+  const authSendBtn = document.getElementById('authSendBtn');
+  const authStatus = document.getElementById('authStatus');
+  const acctEmail = document.getElementById('acctEmail');
+  const signOutLink = document.getElementById('signOutLink');
+
+  function showAuthStatus(message, type) {
+    authStatus.textContent = message;
+    authStatus.className = type;
+  }
+
+  function showSignedIn(session) {
+    currentSession = session;
+    authGate.style.display = 'none';
+    toolContent.style.display = 'block';
+    acctEmail.textContent = session.user.email;
+  }
+
+  function showSignedOut() {
+    currentSession = null;
+    authGate.style.display = 'block';
+    toolContent.style.display = 'none';
+  }
+
+  authSendBtn.addEventListener('click', async () => {
+    const email = authEmailInput.value.trim();
+    if (!email) {
+      showAuthStatus('Please enter an email address first.', 'error');
+      return;
+    }
+    authSendBtn.disabled = true;
+    showAuthStatus('Sending your login link…', 'info');
+
+    const { error } = await db.auth.signInWithOtp({
+      email: email,
+      options: { emailRedirectTo: window.location.href }
+    });
+
+    authSendBtn.disabled = false;
+
+    if (error) {
+      showAuthStatus('Something went wrong: ' + error.message, 'error');
+    } else {
+      showAuthStatus('Check your inbox — we sent a login link to ' + email + '.', 'success');
+    }
+  });
+
+  signOutLink.addEventListener('click', async () => {
+    await db.auth.signOut();
+    showSignedOut();
+  });
+
+  db.auth.onAuthStateChange((event, session) => {
+    if (session && session.user) {
+      showSignedIn(session);
+    } else {
+      showSignedOut();
+    }
+  });
+
+  db.auth.getSession().then(({ data: { session } }) => {
+    if (session && session.user) {
+      showSignedIn(session);
+    }
+  });
+
+  // ---------------------------------------------------------------
+  // Save a generated link to the researcher's account
+  // ---------------------------------------------------------------
+  async function saveLinkToAccount(linkType, barcodeMode) {
+    if (!currentSession) return;
+
+    const payload = {
+      researcher_id: currentSession.user.id,
+      link_type: linkType,
+      barcode_mode: barcodeMode
+    };
+
+    if (linkType === 'survey') {
+      payload.site_title = surveyName.value.trim();
+      payload.site_url = surveyUrl.value.trim();
+    } else if (linkType === 'sms') {
+      payload.survey_phone = phoneNumber.value.trim();
+    } else if (linkType === 'email') {
+      payload.reply_email = replyEmail.value.trim();
+    }
+
+    const { error } = await db.from('links').insert(payload);
+    if (error) {
+      console.error('Could not save link to your account:', error.message);
+    }
+  }
+
+</script>
 
 <script>
   const linkTypeRadios = document.getElementsByName("linkType");
@@ -579,6 +770,10 @@
       copyBtn.style.color = "var(--teal)";
       setTimeout(() => { copyBtn.style.color = ""; }, 1200);
     });
+
+    const type = [...linkTypeRadios].find(r => r.checked).value;
+    const barcode = [...idRadios].find(r => r.checked).value === "true";
+    saveLinkToAccount(type, barcode);
   });
 
   /* QR Code Generator */
