@@ -598,10 +598,11 @@
   // ---------------------------------------------------------------
   // Save a generated link to the researcher's account
   // ---------------------------------------------------------------
-  async function saveLinkToAccount(linkType, barcodeMode) {
+  async function saveLinkToAccount(linkId, linkType, barcodeMode) {
     if (!currentSession) return;
 
     const payload = {
+      id: linkId,
       researcher_id: currentSession.user.id,
       link_type: linkType,
       barcode_mode: barcodeMode
@@ -701,6 +702,8 @@
     }
   }
 
+  let currentLinkId = null;
+
   function buildLink() {
     const type = [...linkTypeRadios].find(r => r.checked).value;
     const barcode = [...idRadios].find(r => r.checked).value;
@@ -717,9 +720,11 @@
       const name = surveyName.value.trim();
       if (!name || !url || urlError.textContent !== "") {
         setOutput("");
+        currentLinkId = null;
         return;
       }
       const encodedName = encodeURIComponent(name);
+      currentLinkId = crypto.randomUUID();
 
       setOutput(
         "https://my-health-passport.netlify.app/portal.html"
@@ -727,28 +732,33 @@
         + "&siteUrl=" + url
         + "&barcode=" + barcode
         + "&linkType=survey"
+        + "&linkId=" + currentLinkId
       );
       return;
     }
 
     if (type === "sms") {
-      if (!phone) { setOutput(""); return; }
+      if (!phone) { setOutput(""); currentLinkId = null; return; }
+      currentLinkId = crypto.randomUUID();
       setOutput(
         "https://my-health-passport.netlify.app/phone.html"
         + "?SurveyPhone=" + encodeURIComponent(phone)
         + "&barcode=" + barcode
         + "&linkType=sms"
+        + "&linkId=" + currentLinkId
       );
       return;
     }
 
     if (type === "email") {
-      if (!email) { setOutput(""); return; }
+      if (!email) { setOutput(""); currentLinkId = null; return; }
+      currentLinkId = crypto.randomUUID();
       setOutput(
         "https://my-health-passport.netlify.app/phone.html"
         + "?replyemail=" + encodeURIComponent(email)
         + "&barcode=" + barcode
         + "&linkType=email"
+        + "&linkId=" + currentLinkId
       );
       return;
     }
@@ -764,7 +774,7 @@
 
   copyBtn.addEventListener("click", () => {
     const text = output.textContent.trim();
-    if (!text || output.classList.contains("empty")) return;
+    if (!text || output.classList.contains("empty") || !currentLinkId) return;
 
     navigator.clipboard.writeText(text).then(() => {
       copyBtn.style.color = "var(--teal)";
@@ -773,7 +783,7 @@
 
     const type = [...linkTypeRadios].find(r => r.checked).value;
     const barcode = [...idRadios].find(r => r.checked).value === "true";
-    saveLinkToAccount(type, barcode);
+    saveLinkToAccount(currentLinkId, type, barcode);
   });
 
   /* QR Code Generator */

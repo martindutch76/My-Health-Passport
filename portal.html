@@ -934,12 +934,27 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // ---------- URL parameters (read first so they can control layout immediately) ----------
         const urlParams = new URLSearchParams(window.location.search);
         const siteTitle = urlParams.get('siteTitle');
         const siteUrl = urlParams.get('siteUrl');
         const barcodeMode = (urlParams.get('barcode') || '').trim().toLowerCase() === 'true';
+        const linkId = urlParams.get('linkId');
+
+        // ---------- Usage tracking (anonymous — no participant data, just "this link was used") ----------
+        const SUPABASE_URL = 'https://hqyvrfftoajdhkccvqam.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_gulOoDgxHgWEVgXvCXojAg_E4Jq4xFY';
+        const { createClient } = supabase;
+        const usageDb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function recordUsageEvent() {
+            if (!linkId) return; // older links without a linkId simply aren't tracked
+            usageDb.from('usage_events').insert({ link_id: linkId }).then(({ error }) => {
+                if (error) console.error('Could not record usage event:', error.message);
+            });
+        }
 
         // Show only the section relevant to the mode this link was built for
         const passportOutputBlock = document.getElementById('passportOutputBlock');
@@ -1231,6 +1246,7 @@
                 : constructTargetUrl(formattedBaseUrl, 'slk', currentPassportNumber);
 
             if (targetUrl) {
+                recordUsageEvent();
                 window.open(targetUrl, '_blank', 'noopener,noreferrer');
             }
         });
