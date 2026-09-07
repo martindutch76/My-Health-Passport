@@ -531,7 +531,7 @@
       const encodedName = encodeURIComponent(name);
 
       setOutput(
-        "https://martindutch76.github.io/My-Health-Passport/portal.html"
+        "https://my-health-passport.netlify.app/portal.html"
         + "?siteTitle=" + encodedName
         + "&siteUrl=" + url
         + "&barcode=" + barcode
@@ -543,7 +543,7 @@
     if (type === "sms") {
       if (!phone) { setOutput(""); return; }
       setOutput(
-        "https://martindutch76.github.io/My-Health-Passport/phone.html"
+        "https://my-health-passport.netlify.app/phone.html"
         + "?SurveyPhone=" + encodeURIComponent(phone)
         + "&barcode=" + barcode
         + "&linkType=sms"
@@ -554,7 +554,7 @@
     if (type === "email") {
       if (!email) { setOutput(""); return; }
       setOutput(
-        "https://martindutch76.github.io/My-Health-Passport/phone.html"
+        "https://my-health-passport.netlify.app/phone.html"
         + "?replyemail=" + encodeURIComponent(email)
         + "&barcode=" + barcode
         + "&linkType=email"
