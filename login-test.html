@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Test — My Health Passport</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f7f6;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e1e8e6;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 400px;
+    width: 100%;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 8px;
+    color: #222b2a;
+  }
+  p.sub {
+    color: #5a6563;
+    font-size: 14px;
+    margin: 0 0 20px;
+  }
+  input[type="email"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+  }
+  button {
+    width: 100%;
+    background: #1e6b63;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover { background: #17544e; }
+  button:disabled { background: #9db3af; cursor: default; }
+  #status {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  #status.info { background: #eef2f1; color: #222b2a; display: block; }
+  #status.success { background: #e6f4ea; color: #1e6b63; display: block; }
+  #status.error { background: #fdecea; color: #a91212; display: block; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Login Test</h1>
+  <p class="sub">Type your email, then check your inbox for a login link.</p>
+
+  <div id="loginForm">
+    <input type="email" id="emailInput" placeholder="you@example.com">
+    <button id="sendLinkBtn" type="button">Send me a login link</button>
+  </div>
+
+  <div id="loggedInView" style="display:none;">
+    <p class="sub" style="margin-bottom:16px;">You're logged in as <strong id="userEmail"></strong>.</p>
+    <button id="signOutBtn" type="button">Sign out</button>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<!-- Step A: load the Supabase library from a CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // ---------------------------------------------------------------
+  // Step B: paste YOUR project's values here (from Settings > API Keys)
+  // ---------------------------------------------------------------
+  const SUPABASE_URL = 'PASTE_YOUR_PROJECT_URL_HERE';
+  const SUPABASE_KEY  = 'PASTE_YOUR_PUBLISHABLE_KEY_HERE';
+
+  // Step C: create the connection to your Supabase project
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Grab references to the bits of the page we'll show/hide/update
+  const loginForm = document.getElementById('loginForm');
+  const loggedInView = document.getElementById('loggedInView');
+  const userEmailEl = document.getElementById('userEmail');
+  const emailInput = document.getElementById('emailInput');
+  const sendLinkBtn = document.getElementById('sendLinkBtn');
+  const signOutBtn = document.getElementById('signOutBtn');
+  const statusEl = document.getElementById('status');
+
+  function showStatus(message, type) {
+    statusEl.textContent = message;
+    statusEl.className = type; // 'info', 'success', or 'error'
+  }
+
+  function showLoggedIn(email) {
+    loginForm.style.display = 'none';
+    loggedInView.style.display = 'block';
+    userEmailEl.textContent = email;
+  }
+
+  function showLoggedOut() {
+    loginForm.style.display = 'block';
+    loggedInView.style.display = 'none';
+  }
+
+  // Step D: when the button is clicked, ask Supabase to send a magic link
+  sendLinkBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      showStatus('Please enter an email address first.', 'error');
+      return;
+    }
+
+    sendLinkBtn.disabled = true;
+    showStatus('Sending your login link…', 'info');
+
+    const { error } = await db.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: window.location.href
+      }
+    });
+
+    sendLinkBtn.disabled = false;
+
+    if (error) {
+      showStatus('Something went wrong: ' + error.message, 'error');
+    } else {
+      showStatus('Check your inbox — we sent a login link to ' + email + '.', 'success');
+    }
+  });
+
+  // Step E: sign out button
+  signOutBtn.addEventListener('click', async () => {
+    await db.auth.signOut();
+    showLoggedOut();
+    showStatus('You have been signed out.', 'info');
+  });
+
+  // Step F: whenever the login state changes (including right after
+  // clicking the magic link), update what the page shows
+  db.auth.onAuthStateChange((event, session) => {
+    if (session && session.user) {
+      showLoggedIn(session.user.email);
+    } else {
+      showLoggedOut();
+    }
+  });
+
+  // Step G: also check on page load, in case someone is already logged in
+  db.auth.getSession().then(({ data: { session } }) => {
+    if (session && session.user) {
+      showLoggedIn(session.user.email);
+    }
+  });
+</script>
+
+</body>
+</html>
