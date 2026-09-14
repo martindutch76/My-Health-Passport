@@ -1891,11 +1891,9 @@ Sources:
 <div class="modal-overlay" id="hypocorismModal" hidden>
   <div class="modal-box">
     <h3>Is this your full first name?</h3>
-    <p id="hypocorismMessage"></p>
-    <input type="text" id="hypocorismFormalName" placeholder="Formal first name">
+    <p>Please use your formal name, as recorded on your Medicare card or passport.</p>
     <div class="modal-actions">
-      <button type="button" class="modal-btn-primary" id="hypocorismUseFormal">Use this name instead</button>
-      <button type="button" class="modal-btn-secondary" id="hypocorismKeepAsIs">Keep as entered</button>
+      <button type="button" class="modal-btn-primary" id="hypocorismAcknowledge">Acknowledge</button>
     </div>
   </div>
 </div>
@@ -1925,18 +1923,11 @@ Sources:
   }
 
   const hypocorismModal = document.getElementById('hypocorismModal');
-  const hypocorismMessage = document.getElementById('hypocorismMessage');
-  const hypocorismFormalName = document.getElementById('hypocorismFormalName');
-  const hypocorismUseFormal = document.getElementById('hypocorismUseFormal');
-  const hypocorismKeepAsIs = document.getElementById('hypocorismKeepAsIs');
+  const hypocorismAcknowledge = document.getElementById('hypocorismAcknowledge');
   let lastDismissedHypocorism = null;
 
-  function openHypocorismModal(enteredName) {
-    hypocorismMessage.textContent =
-      `"${enteredName}" is commonly a shortened version of a longer name. If you'd like, enter your formal first name below — as it appears on your Medicare card or passport. This is optional; you can also keep "${enteredName}" if you prefer.`;
-    hypocorismFormalName.value = '';
+  function openHypocorismModal() {
     hypocorismModal.hidden = false;
-    hypocorismFormalName.focus();
   }
 
   function closeHypocorismModal() {
@@ -1949,21 +1940,11 @@ Sources:
     const lower = entered.toLowerCase();
     if (lower === lastDismissedHypocorism) return;
     if (hypocorismSet.has(lower)) {
-      openHypocorismModal(entered);
+      openHypocorismModal();
     }
   });
 
-  hypocorismUseFormal.addEventListener('click', () => {
-    const formal = hypocorismFormalName.value.trim();
-    if (formal) {
-      givenInput.value = formal;
-      givenInput.dispatchEvent(new Event('input'));
-    }
-    lastDismissedHypocorism = null;
-    closeHypocorismModal();
-  });
-
-  hypocorismKeepAsIs.addEventListener('click', () => {
+  hypocorismAcknowledge.addEventListener('click', () => {
     lastDismissedHypocorism = givenInput.value.trim().toLowerCase();
     closeHypocorismModal();
   });
