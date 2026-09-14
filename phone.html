@@ -346,6 +346,91 @@
             margin: 0.3rem 0 0;
         }
 
+        .dob-error {
+            font-size: 0.75rem;
+            color: var(--redcap-red);
+            font-weight: 700;
+            margin: 0.4rem 0 0;
+        }
+
+        /* ---- Hypocorism check modal ---- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(34, 43, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .modal-overlay[hidden] { display: none; }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 28px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .modal-box h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            color: var(--mhp-dark);
+        }
+
+        .modal-box p {
+            margin: 0 0 16px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--mhp-gray);
+        }
+
+        .modal-box input[type="text"] {
+            width: 100%;
+            padding: 9px 11px;
+            font-size: 15px;
+            font-family: inherit;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 14px;
+            outline: none;
+        }
+        .modal-box input[type="text"]:focus { border-color: var(--mhp-teal); }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-actions button {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .modal-btn-primary {
+            background: var(--mhp-teal);
+            color: #fff;
+            border: none;
+        }
+        .modal-btn-primary:hover { background: #17544e; }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: var(--mhp-gray);
+            border: 1px solid var(--border-color);
+        }
+        .modal-btn-secondary:hover { background: var(--bg-color); }
+
         input[type="text"], select {
             width: 100%;
             padding: 0.7rem 0.85rem;
@@ -814,6 +899,7 @@
                             <select id="month" aria-label="Month"></select>
                             <input type="text" id="year" inputmode="numeric" maxlength="4" placeholder="YYYY">
                         </div>
+                        <p class="dob-error" id="dobError" hidden></p>
                     </div>
 
                     <div class="field-group">
@@ -984,6 +1070,19 @@
         </div>
     </div>
 
+    <!-- Hypocorism check modal -->
+    <div class="modal-overlay" id="hypocorismModal" hidden>
+        <div class="modal-box">
+            <h3>Is this your full first name?</h3>
+            <p id="hypocorismMessage"></p>
+            <input type="text" id="hypocorismFormalName" placeholder="Formal first name">
+            <div class="modal-actions">
+                <button type="button" class="modal-btn-primary" id="hypocorismUseFormal">Use this name instead</button>
+                <button type="button" class="modal-btn-secondary" id="hypocorismKeepAsIs">Keep as entered</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // ---------- URL parameters (read first so they can control layout immediately) ----------
@@ -994,15 +1093,25 @@
         const linkId = urlParams.get('linkId');
 
         // ---------- Usage tracking (anonymous — no participant data, just "this link was used") ----------
+        // Wrapped in try/catch: if the Supabase library fails to load (ad blocker, network
+        // issue, CDN outage), usage tracking silently disables itself instead of breaking
+        // the rest of the page — generating a Passport Number must never depend on this.
         const SUPABASE_URL = 'https://hqyvrfftoajdhkccvqam.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_gulOoDgxHgWEVgXvCXojAg_E4Jq4xFY';
-        const { createClient } = supabase;
-        const usageDb = createClient(SUPABASE_URL, SUPABASE_KEY);
+        let usageDb = null;
+        try {
+            const { createClient } = supabase;
+            usageDb = createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.error('Usage tracking unavailable (Supabase library did not load):', e.message);
+        }
 
         function recordUsageEvent() {
-            if (!linkId) return; // older links without a linkId simply aren't tracked
+            if (!linkId || !usageDb) return; // older links without a linkId, or tracking unavailable
             usageDb.from('usage_events').insert({ link_id: linkId }).then(({ error }) => {
                 if (error) console.error('Could not record usage event:', error.message);
+            }).catch(err => {
+                console.error('Could not record usage event:', err.message);
             });
         }
 
@@ -1039,10 +1148,65 @@
         // ---------- SLK-581 generation (mirrors the main site's generator) ----------
         const surnameInput = document.getElementById('surname');
         const givenInput = document.getElementById('givenname');
+
+        // ---------- Hypocorism check (reuses the same Supabase client as usage tracking) ----------
+        let hypocorismSet = new Set();
+        if (usageDb) {
+            usageDb.from('hypocorisms').select('name').then(({ data, error }) => {
+                if (error) { console.error('Could not load hypocorism list:', error.message); return; }
+                hypocorismSet = new Set(data.map(row => row.name.toLowerCase()));
+            });
+        }
+
+        const hypocorismModal = document.getElementById('hypocorismModal');
+        const hypocorismMessage = document.getElementById('hypocorismMessage');
+        const hypocorismFormalName = document.getElementById('hypocorismFormalName');
+        const hypocorismUseFormal = document.getElementById('hypocorismUseFormal');
+        const hypocorismKeepAsIs = document.getElementById('hypocorismKeepAsIs');
+        let lastDismissedHypocorism = null;
+
+        function openHypocorismModal(enteredName) {
+            hypocorismMessage.textContent =
+                `"${enteredName}" is commonly a shortened version of a longer name. If you'd like, enter your formal first name below — as it appears on your Medicare card or passport. This is optional; you can also keep "${enteredName}" if you prefer.`;
+            hypocorismFormalName.value = '';
+            hypocorismModal.hidden = false;
+            hypocorismFormalName.focus();
+        }
+
+        function closeHypocorismModal() {
+            hypocorismModal.hidden = true;
+        }
+
+        givenInput.addEventListener('blur', () => {
+            const entered = givenInput.value.trim();
+            if (!entered) return;
+            const lower = entered.toLowerCase();
+            if (lower === lastDismissedHypocorism) return;
+            if (hypocorismSet.has(lower)) {
+                openHypocorismModal(entered);
+            }
+        });
+
+        hypocorismUseFormal.addEventListener('click', () => {
+            const formal = hypocorismFormalName.value.trim();
+            if (formal) {
+                givenInput.value = formal;
+                givenInput.dispatchEvent(new Event('input'));
+            }
+            lastDismissedHypocorism = null;
+            closeHypocorismModal();
+        });
+
+        hypocorismKeepAsIs.addEventListener('click', () => {
+            lastDismissedHypocorism = givenInput.value.trim().toLowerCase();
+            closeHypocorismModal();
+        });
+
         const daySelect = document.getElementById('day');
         const monthSelect = document.getElementById('month');
         const yearInput = document.getElementById('year');
         const sexSelect = document.getElementById('sex');
+        const dobError = document.getElementById('dobError');
         const passportNumber = document.getElementById('passportNumber');
         const phoneticBox = document.getElementById('phoneticBox');
         const phoneticChips = document.getElementById('phoneticChips');
@@ -1226,6 +1390,40 @@
 
         let currentPassportNumber = '';
 
+        // ---------- Date of birth validation ----------
+        function validateDob(day, month, year) {
+            if (!day || !month || !year) return { valid: true };
+
+            const d = parseInt(day, 10);
+            const m = parseInt(month, 10);
+            const y = parseInt(year, 10);
+            const dob = new Date(Date.UTC(y, m - 1, d));
+
+            // Catches impossible calendar dates (e.g. 30 Feb), which JS would otherwise silently roll over
+            if (dob.getUTCFullYear() !== y || dob.getUTCMonth() !== m - 1 || dob.getUTCDate() !== d) {
+                return { valid: false, message: 'Please enter a valid calendar date.' };
+            }
+
+            const now = new Date();
+            const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+
+            if (dob.getTime() > today.getTime()) {
+                return { valid: false, message: 'Date of birth cannot be in the future.' };
+            }
+
+            let age = today.getUTCFullYear() - dob.getUTCFullYear();
+            const hadBirthdayThisYear =
+                (today.getUTCMonth() > dob.getUTCMonth()) ||
+                (today.getUTCMonth() === dob.getUTCMonth() && today.getUTCDate() >= dob.getUTCDate());
+            if (!hadBirthdayThisYear) age--;
+
+            if (age > 110) {
+                return { valid: false, message: 'Please check the date of birth — age cannot exceed 110 years.' };
+            }
+
+            return { valid: true };
+        }
+
         function computePassportNumber() {
             const hasSurnameInput = surnameInput.value.replace(/[^A-Za-z]/g, '').length > 0;
             const surnameChars = hasSurnameInput
@@ -1242,6 +1440,14 @@
             let yearVal = yearInput.value.replace(/[^0-9]/g, '').slice(0, 4);
             const year = yearVal.length === 4 ? yearVal : null;
 
+            const dobCheck = validateDob(day, month, year);
+            if (!dobCheck.valid) {
+                dobError.textContent = dobCheck.message;
+                dobError.hidden = false;
+            } else {
+                dobError.hidden = true;
+            }
+
             const dobChars = [];
             (day || '..').split('').forEach(c => dobChars.push(day ? c : null));
             (month || '..').split('').forEach(c => dobChars.push(month ? c : null));
@@ -1254,7 +1460,7 @@
             updateProgressTick(maskArc, tickGroup, filledCount, fieldStates.length);
 
             const allChars = [...surnameChars, ...givenChars, ...dobChars, sexChar];
-            const complete = allChars.every(c => c);
+            const complete = allChars.every(c => c) && dobCheck.valid;
 
             updateProgressTick(maskArc2, tickGroup2, complete ? 1 : 0, 1);
             forwardBadge.classList.toggle('active', complete);

@@ -255,6 +255,91 @@
   }
   .required-note .required-mark { margin-right: 3px; }
 
+  .dob-error {
+    font-size: 12.5px;
+    color: var(--err);
+    font-weight: 600;
+    margin: 6px 0 0;
+  }
+
+  /* ---- Hypocorism check modal ---- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 42, 39, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+  }
+  .modal-overlay[hidden] { display: none; }
+
+  .modal-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    padding: 28px;
+    max-width: 420px;
+    width: 100%;
+  }
+
+  .modal-box h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .modal-box p {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .modal-box input[type="text"] {
+    width: 100%;
+    padding: 9px 11px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    box-sizing: border-box;
+    margin-bottom: 14px;
+    outline: none;
+  }
+  .modal-box input[type="text"]:focus { border-color: var(--teal); }
+
+  .modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .modal-btn-primary {
+    background: var(--teal);
+    color: #fff;
+    border: none;
+  }
+  .modal-btn-primary:hover { background: var(--teal-dark); }
+
+  .modal-btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .modal-btn-secondary:hover { background: var(--bg); }
+
   .dob-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1.3fr;
@@ -1476,6 +1561,7 @@
           <label><input type="checkbox" id="monthUnknown"> Month unknown</label>
           <label><input type="checkbox" id="yearUnknown"> Year unknown</label>
         </div>
+        <p class="dob-error" id="dobError" hidden></p>
       </fieldset>
 
       <fieldset>
@@ -1801,13 +1887,91 @@ Sources:
   </div>
 </section>
 
+<!-- Hypocorism check modal -->
+<div class="modal-overlay" id="hypocorismModal" hidden>
+  <div class="modal-box">
+    <h3>Is this your full first name?</h3>
+    <p id="hypocorismMessage"></p>
+    <input type="text" id="hypocorismFormalName" placeholder="Formal first name">
+    <div class="modal-actions">
+      <button type="button" class="modal-btn-primary" id="hypocorismUseFormal">Use this name instead</button>
+      <button type="button" class="modal-btn-secondary" id="hypocorismKeepAsIs">Keep as entered</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   const surnameInput = document.getElementById('surname');
   const givenInput = document.getElementById('givenname');
+
+  // ---------- Hypocorism check ----------
+  // Uses the project's Supabase project purely as a read-only reference list.
+  // If it can't load (offline, ad blocker, table not set up yet), the check
+  // just silently never triggers — it must never block name entry.
+  const HYPO_SUPABASE_URL = 'https://hqyvrfftoajdhkccvqam.supabase.co';
+  const HYPO_SUPABASE_KEY = 'sb_publishable_gulOoDgxHgWEVgXvCXojAg_E4Jq4xFY';
+  let hypocorismSet = new Set();
+  try {
+    const { createClient } = supabase;
+    const hypoDb = createClient(HYPO_SUPABASE_URL, HYPO_SUPABASE_KEY);
+    hypoDb.from('hypocorisms').select('name').then(({ data, error }) => {
+      if (error) { console.error('Could not load hypocorism list:', error.message); return; }
+      hypocorismSet = new Set(data.map(row => row.name.toLowerCase()));
+    });
+  } catch (e) {
+    console.error('Hypocorism check unavailable (Supabase library did not load):', e.message);
+  }
+
+  const hypocorismModal = document.getElementById('hypocorismModal');
+  const hypocorismMessage = document.getElementById('hypocorismMessage');
+  const hypocorismFormalName = document.getElementById('hypocorismFormalName');
+  const hypocorismUseFormal = document.getElementById('hypocorismUseFormal');
+  const hypocorismKeepAsIs = document.getElementById('hypocorismKeepAsIs');
+  let lastDismissedHypocorism = null;
+
+  function openHypocorismModal(enteredName) {
+    hypocorismMessage.textContent =
+      `"${enteredName}" is commonly a shortened version of a longer name. If you'd like, enter your formal first name below — as it appears on your Medicare card or passport. This is optional; you can also keep "${enteredName}" if you prefer.`;
+    hypocorismFormalName.value = '';
+    hypocorismModal.hidden = false;
+    hypocorismFormalName.focus();
+  }
+
+  function closeHypocorismModal() {
+    hypocorismModal.hidden = true;
+  }
+
+  givenInput.addEventListener('blur', () => {
+    const entered = givenInput.value.trim();
+    if (!entered) return;
+    const lower = entered.toLowerCase();
+    if (lower === lastDismissedHypocorism) return;
+    if (hypocorismSet.has(lower)) {
+      openHypocorismModal(entered);
+    }
+  });
+
+  hypocorismUseFormal.addEventListener('click', () => {
+    const formal = hypocorismFormalName.value.trim();
+    if (formal) {
+      givenInput.value = formal;
+      givenInput.dispatchEvent(new Event('input'));
+    }
+    lastDismissedHypocorism = null;
+    closeHypocorismModal();
+  });
+
+  hypocorismKeepAsIs.addEventListener('click', () => {
+    lastDismissedHypocorism = givenInput.value.trim().toLowerCase();
+    closeHypocorismModal();
+  });
+
   const daySelect = document.getElementById('day');
   const monthSelect = document.getElementById('month');
   const yearInput = document.getElementById('year');
+  const dobError = document.getElementById('dobError');
   const dayUnknown = document.getElementById('dayUnknown');
   const monthUnknown = document.getElementById('monthUnknown');
   const yearUnknown = document.getElementById('yearUnknown');
@@ -1902,6 +2066,43 @@ Sources:
     copyHashBtn.disabled = false;
   }
 
+  // ---------- Date of birth validation ----------
+  // Skips validation while any component is unset or marked "unknown" (99 / 9999),
+  // since a fuzzy/partial date of birth can't be meaningfully checked.
+  function validateDob(day, month, year) {
+    if (!day || !month || !year) return { valid: true };
+    if (day === '99' || month === '99' || year === '9999') return { valid: true };
+
+    const d = parseInt(day, 10);
+    const m = parseInt(month, 10);
+    const y = parseInt(year, 10);
+    const dob = new Date(Date.UTC(y, m - 1, d));
+
+    // Catches impossible calendar dates (e.g. 30 Feb), which JS would otherwise silently roll over
+    if (dob.getUTCFullYear() !== y || dob.getUTCMonth() !== m - 1 || dob.getUTCDate() !== d) {
+      return { valid: false, message: 'Please enter a valid calendar date.' };
+    }
+
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+
+    if (dob.getTime() > today.getTime()) {
+      return { valid: false, message: 'Date of birth cannot be in the future.' };
+    }
+
+    let age = today.getUTCFullYear() - dob.getUTCFullYear();
+    const hadBirthdayThisYear =
+      (today.getUTCMonth() > dob.getUTCMonth()) ||
+      (today.getUTCMonth() === dob.getUTCMonth() && today.getUTCDate() >= dob.getUTCDate());
+    if (!hadBirthdayThisYear) age--;
+
+    if (age > 110) {
+      return { valid: false, message: 'Please check the date of birth — age cannot exceed 110 years.' };
+    }
+
+    return { valid: true };
+  }
+
   function compute() {
     const surnameLetters = extractLetters(surnameInput.value, [2, 3, 5]).map(c => c || '2');
     const surnameFilled = extractLetters(surnameInput.value, [2, 3, 5]);
@@ -1918,6 +2119,14 @@ Sources:
     let yearVal = yearInput.value.replace(/[^0-9]/g, '').slice(0, 4);
     const year = yearUnknown.checked ? '9999' : (yearVal.length === 4 ? yearVal : null);
 
+    const dobCheck = validateDob(day, month, year);
+    if (!dobCheck.valid) {
+      dobError.textContent = dobCheck.message;
+      dobError.hidden = false;
+    } else {
+      dobError.hidden = true;
+    }
+
     const dobChars = [];
     (day || '..').split('').forEach(c => dobChars.push(day ? c : null));
     (month || '..').split('').forEach(c => dobChars.push(month ? c : null));
@@ -1931,7 +2140,7 @@ Sources:
     buildBoxes(boxesSex, [sexChar]);
 
     const allChars = [...surnameChars, ...givenChars, ...dobChars, sexChar];
-    const complete = allChars.every(c => c);
+    const complete = allChars.every(c => c) && dobCheck.valid;
 
     if (complete) {
       fullKey.innerHTML = allChars.join('');
