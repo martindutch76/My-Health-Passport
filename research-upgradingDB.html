@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adding SHA-256 keys to an SLK581 field — Instructions for database managers</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpath%20d%3D%22M11%208.5C11%207.12%2012.12%206%2013.5%206H31C32.66%206%2034%207.34%2034%209V38C34%2039.1%2033.1%2040%2032%2040H14.5C12.57%2040%2011%2038.43%2011%2036.5V8.5Z%22%20fill%3D%22%23fff%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M11%2034.5C11%2033.12%2012.12%2032%2013.5%2032H34V36.5C34%2038.43%2032.43%2040%2030.5%2040H13.5C12.12%2040%2011%2038.88%2011%2037.5V34.5Z%22%20fill%3D%22%231E2A27%22%20fill-opacity%3D%220.08%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M22.5%2012.5L29%2014.8V19.3C29%2023.3%2026.3%2026.4%2022.5%2027.6C18.7%2026.4%2016%2023.3%2016%2019.3V14.8L22.5%2012.5Z%22%20fill%3D%22%231B6E68%22/%3E%3Ccircle%20cx%3D%2222.5%22%20cy%3D%2218.1%22%20r%3D%222.1%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M19%2022.8C19%2020.7%2020.5%2019.6%2022.5%2019.6C24.5%2019.6%2026%2020.7%2026%2022.8%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EDF2F0;
+    --surface: #FBFCFB;
+    --ink: #1E2A27;
+    --muted: #5B6B67;
+    --line: #C6D1CD;
+    --line-soft: #DCE4E1;
+    --teal: #1B6E68;
+    --teal-dark: #144F4B;
+    --amber: #C07A22;
+    --amber-soft: #F2DFC0;
+    --err: #A6402F;
+    --radius: 3px;
+
+    --code-bg: #1E2A27;
+    --code-text: #E7ECE9;
+    --code-key: #8FE0D2;
+    --code-string: #E8C27E;
+    --code-comment: #7C8C86;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  a { color: var(--teal-dark); }
+
+  /* ---- Site header (shared brand lockup) ---- */
+  .site-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .site-header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-icon { width: 46px; height: 46px; flex: none; }
+
+  .brand-divider {
+    width: 1px;
+    height: 34px;
+    background: var(--line);
+    flex: none;
+  }
+
+  .brand-text { display: flex; flex-direction: column; }
+
+  .brand-name {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .brand-name .line1 { color: var(--ink); display: block; }
+  .brand-name .line2 { color: var(--teal); display: block; }
+
+  .brand-tagline { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .header-badge {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    background: var(--amber-soft);
+    border: 1px solid var(--amber);
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 620px) {
+    .brand-tagline { display: none; }
+    .site-header-inner { padding: 14px 16px; }
+  }
+
+  /* ---- Page layout ---- */
+  .sheet{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  .page-intro { max-width: 640px; margin-bottom: 20px; }
+
+  .section-eyebrow {
+    margin: 0 0 14px;
+    color: var(--teal-dark);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  h1{
+    font-size: clamp(26px, 4vw, 32px);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+    margin: 0 0 14px;
+    max-width: 26ch;
+    color: var(--ink);
+  }
+
+  .section-accent {
+    width: 56px;
+    height: 4px;
+    margin: 0 0 20px;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+
+  .dek{
+    font-size: 15px;
+    color: var(--muted);
+    margin: 0;
+    max-width: 56ch;
+  }
+
+  /* ---- Body copy ---- */
+  section.intro{
+    padding-top: 12px;
+  }
+
+  section.intro p{
+    font-size: 15px;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+
+  .assumption-box{
+    border-left: 4px solid var(--amber);
+    background: var(--amber-soft);
+    border-radius: 0 6px 6px 0;
+    padding: 14px 18px;
+    margin: 22px 0 4px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .assumption-box strong{ color: var(--ink); }
+
+  .assumption-box code{
+    font-family: 'IBM Plex Mono', monospace;
+    background: rgba(255,255,255,0.6);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  /* ---- Procedure sections ---- */
+  .procedures{
+    counter-reset: proc;
+    margin-top: 40px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .procedure{
+    counter-increment: proc;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--line-soft);
+    position: relative;
+    padding-left: 46px;
+  }
+
+  .procedure::before{
+    content: counter(proc, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    width: 30px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+
+  .procedure h2{
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+
+  .procedure .note{
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+
+  .procedure .note code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--line-soft);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+
+  /* ---- Code panel ---- */
+  .code-panel{
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--code-bg);
+  }
+
+  .code-panel__bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px;
+    background: #16201D;
+    border-bottom: 1px solid #2A3733;
+  }
+
+  .code-panel__lang{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--code-key);
+    letter-spacing: 0.03em;
+  }
+
+  .copy-btn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #38423F;
+    color: var(--code-text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    padding: 5px 9px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .copy-btn:hover{
+    background: #24302D;
+    border-color: var(--teal);
+  }
+
+  .copy-btn svg{ width: 13px; height: 13px; flex-shrink: 0; }
+
+  .copy-btn.copied{
+    border-color: var(--code-key);
+    color: var(--code-key);
+  }
+
+  .code-panel pre{
+    margin: 0;
+    padding: 16px 18px 18px;
+    overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--code-text);
+  }
+
+  .tok-kw{ color: #E38C8C; }
+  .tok-fn{ color: var(--code-key); }
+  .tok-str{ color: var(--code-string); }
+  .tok-com{ color: var(--code-comment); font-style: italic; }
+
+  /* ---- Closing notes ---- */
+  .closing-notes{
+    margin-top: 36px;
+  }
+
+  .closing-notes h2{
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    margin: 0 0 14px;
+  }
+
+  .closing-notes ul{
+    padding-left: 20px;
+    margin: 0;
+  }
+
+  .closing-notes li{
+    margin-bottom: 12px;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+
+  .closing-notes li strong{ font-weight: 700; }
+
+  footer{
+    max-width: 760px;
+    margin: 50px auto 0;
+    padding: 20px 20px 0;
+    border-top: 1px solid var(--line-soft);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--line-soft);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 560px){
+    .sheet{ padding: 40px 20px 80px; }
+    .procedure{ padding-left: 0; }
+    .procedure::before{ position: static; margin-bottom: 12px; }
+    footer{ flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .copy-btn{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 8.5C11 7.12 12.12 6 13.5 6H31C32.66 6 34 7.34 34 9V38C34 39.1 33.1 40 32 40H14.5C12.57 40 11 38.43 11 36.5V8.5Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M11 34.5C11 33.12 12.12 32 13.5 32H34V36.5C34 38.43 32.43 40 30.5 40H13.5C12.12 40 11 38.88 11 37.5V34.5Z" fill="var(--ink)" fill-opacity="0.06" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M22.5 13L28.5 15.1V19.3C28.5 23 26 25.9 22.5 27C19 25.9 16.5 23 16.5 19.3V15.1L22.5 13Z" fill="var(--teal)"/>
+        <circle cx="22.5" cy="18.3" r="1.9" fill="#fff"/>
+        <path d="M19.3 22.5C19.3 20.6 20.7 19.6 22.5 19.6C24.3 19.6 25.7 20.6 25.7 22.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-divider"></div>
+      <div class="brand-text">
+        <span class="brand-name"><span class="line1">My Health</span><span class="line2">Passport</span></span>
+        <span class="brand-tagline">Your health research identity. Your choice.</span>
+      </div>
+    </div>
+    <span class="header-badge">For Database Administrators</span>
+  </div>
+</header>
+
+<div class="sheet">
+
+  <header class="page-intro">
+    <p class="section-eyebrow">Database administration — reference note</p>
+    <h1>Adding SHA-256 keys to an existing SLK581-enabled database</h1>
+    <div class="section-accent" aria-hidden="true"></div>
+    <p class="dek">Instructions for database managers on generating a one-way hash of a Statistical Linkage Key for existing records, and keeping it in sync automatically for every record added or changed from now on.</p>
+  </header>
+
+  <section class="intro">
+    <p>Most existing databases that record an SLK581 field can be upgraded to also store a SHA-256 one-way hash of that key — and to keep generating it automatically, with no ongoing maintenance. No new infrastructure is required, this is achieved through simple SQL programming that most database managers can run directly against their existing tables.</p>
+    <p>The queries below add a new field called <strong>SHA256</strong> as a <em>generated column</em>. A generated column is calculated by the database itself rather than written to directly, so a single statement does two jobs at once: it computes the hash for every row already in the table, and it recalculates the hash automatically whenever an SLK581 value is later inserted or modified. No separate backfill step and no trigger are needed.</p>
+    <p>In every case, the SLK581 value is capitalised and stripped of spaces before it is hashed. Normalising case and spacing first ensures that the same person produces the same hash regardless of which source system originally recorded their record.</p>
+
+    <div class="assumption-box">
+      <strong>Assumption:</strong> the code below assumes the existing field is named <code>SLK581</code>. If your table uses a different column name, replace it before running these queries. You will also need to replace <code>your_table</code> with the name of the table that contains the SLK581 field.
+    </div>
+  </section>
+
+  <div class="procedures">
+
+    <article class="procedure">
+      <h2>PostgreSQL</h2>
+      <p class="note">Requires the <code>pgcrypto</code> extension, enabled once per database. The <code>STORED</code> column backfills existing rows immediately and recalculates on every future write to SLK581.</p>
+      <div class="code-panel" data-code-id="postgres">
+        <div class="code-panel__bar">
+          <span class="code-panel__lang">SQL &middot; PostgreSQL</span>
+          <button class="copy-btn" data-target="postgres" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span class="copy-label">Copy</span>
+          </button>
+        </div>
+        <pre id="postgres"><span class="tok-com">-- Enable the hashing extension (once per database)</span>
+<span class="tok-kw">CREATE EXTENSION IF NOT EXISTS</span> pgcrypto;
+
+<span class="tok-com">-- Add the field as a generated column</span>
+<span class="tok-com">-- Backfills existing rows and recalculates on every future insert/update</span>
+<span class="tok-kw">ALTER TABLE</span> your_table
+<span class="tok-kw">ADD COLUMN</span> SHA256 <span class="tok-kw">TEXT</span>
+<span class="tok-kw">GENERATED ALWAYS AS</span> (
+    <span class="tok-fn">encode</span>(<span class="tok-fn">digest</span>(<span class="tok-fn">UPPER</span>(<span class="tok-fn">REPLACE</span>(SLK581, <span class="tok-str">' '</span>, <span class="tok-str">''</span>)), <span class="tok-str">'sha256'</span>), <span class="tok-str">'hex'</span>)
+) <span class="tok-kw">STORED</span>;</pre>
+      </div>
+    </article>
+
+    <article class="procedure">
+      <h2>MySQL / MariaDB</h2>
+      <p class="note">No extension required — <code>SHA2()</code> is built in. <code>STORED</code> backfills existing rows immediately and recalculates on every future write to SLK581.</p>
+      <div class="code-panel" data-code-id="mysql">
+        <div class="code-panel__bar">
+          <span class="code-panel__lang">SQL &middot; MySQL / MariaDB</span>
+          <button class="copy-btn" data-target="mysql" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span class="copy-label">Copy</span>
+          </button>
+        </div>
+        <pre id="mysql"><span class="tok-com">-- Add the field as a generated column</span>
+<span class="tok-com">-- Backfills existing rows and recalculates on every future insert/update</span>
+<span class="tok-kw">ALTER TABLE</span> your_table
+<span class="tok-kw">ADD COLUMN</span> SHA256 <span class="tok-kw">CHAR</span>(64)
+<span class="tok-kw">GENERATED ALWAYS AS</span> (
+    <span class="tok-fn">SHA2</span>(<span class="tok-fn">UPPER</span>(<span class="tok-fn">REPLACE</span>(SLK581, <span class="tok-str">' '</span>, <span class="tok-str">''</span>)), 256)
+) <span class="tok-kw">STORED</span>;</pre>
+      </div>
+    </article>
+
+    <article class="procedure">
+      <h2>SQL Server</h2>
+      <p class="note"><code>HASHBYTES</code> returns binary, so the result is converted to a readable hex string. <code>PERSISTED</code> backfills existing rows immediately and recalculates on every future write to SLK581.</p>
+      <div class="code-panel" data-code-id="sqlserver">
+        <div class="code-panel__bar">
+          <span class="code-panel__lang">SQL &middot; SQL Server</span>
+          <button class="copy-btn" data-target="sqlserver" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span class="copy-label">Copy</span>
+          </button>
+        </div>
+        <pre id="sqlserver"><span class="tok-com">-- Add the field as a computed column</span>
+<span class="tok-com">-- Backfills existing rows and recalculates on every future insert/update</span>
+<span class="tok-kw">ALTER TABLE</span> your_table
+<span class="tok-kw">ADD</span> SHA256 <span class="tok-kw">AS</span> (
+    <span class="tok-fn">CONVERT</span>(<span class="tok-kw">VARCHAR</span>(64), <span class="tok-fn">HASHBYTES</span>(<span class="tok-str">'SHA2_256'</span>, <span class="tok-fn">UPPER</span>(<span class="tok-fn">REPLACE</span>(SLK581, <span class="tok-str">' '</span>, <span class="tok-str">''</span>))), 2)
+) <span class="tok-kw">PERSISTED</span>;</pre>
+      </div>
+    </article>
+
+  </div>
+
+  <section class="closing-notes">
+    <h2>Before running this at scale</h2>
+    <ul>
+      <li><strong>One statement, not two.</strong> Adding SHA256 as a generated column both backfills every existing row and keeps future inserts and updates in sync. There is no separate step to remember, and no risk of the hash drifting out of date.</li>
+      <li><strong>SHA256 can't be hand-edited.</strong> Because the database calculates it, you can't write to SHA256 directly — any attempt to do so will be rejected.</li>
+      <li><strong>NULL values.</strong> If SLK581 can be NULL, SHA256 will be NULL for that row rather than hashing an empty string.</li>
+      <li><strong>One-way only.</strong> A SHA-256 hash cannot be reversed back into the original SLK581. Keep the source SLK581 field if you still need to regenerate or re-verify hashes in future.</li>
+    </ul>
+  </section>
+
+</div>
+
+<footer>
+  <span>Reference note for internal use</span>
+  <span>Replace <code>your_table</code> before running</span>
+</footer>
+
+<script>
+  function copyCode(btn) {
+    const targetId = btn.getAttribute('data-target');
+    const codeEl = document.getElementById(targetId);
+    const text = codeEl.innerText;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const label = btn.querySelector('.copy-label');
+      const originalLabel = label.textContent;
+      btn.classList.add('copied');
+      label.textContent = 'Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = originalLabel;
+      }, 1800);
+    }).catch(() => {
+      const label = btn.querySelector('.copy-label');
+      label.textContent = 'Select & copy manually';
+    });
+  }
+</script>
+
+</body>
+</html>
