@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV Batch Generator — My Health Passport</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpath%20d%3D%22M11%208.5C11%207.12%2012.12%206%2013.5%206H31C32.66%206%2034%207.34%2034%209V38C34%2039.1%2033.1%2040%2032%2040H14.5C12.57%2040%2011%2038.43%2011%2036.5V8.5Z%22%20fill%3D%22%23fff%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M11%2034.5C11%2033.12%2012.12%2032%2013.5%2032H34V36.5C34%2038.43%2032.43%2040%2030.5%2040H13.5C12.12%2040%2011%2038.88%2011%2037.5V34.5Z%22%20fill%3D%22%231E2A27%22%20fill-opacity%3D%220.08%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M22.5%2012.5L29%2014.8V19.3C29%2023.3%2026.3%2026.4%2022.5%2027.6C18.7%2026.4%2016%2023.3%2016%2019.3V14.8L22.5%2012.5Z%22%20fill%3D%22%231B6E68%22/%3E%3Ccircle%20cx%3D%2222.5%22%20cy%3D%2218.1%22%20r%3D%222.1%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M19%2022.8C19%2020.7%2020.5%2019.6%2022.5%2019.6C24.5%2019.6%2026%2020.7%2026%2022.8%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EDF2F0;
+    --surface: #FBFCFB;
+    --ink: #1E2A27;
+    --muted: #5B6B67;
+    --line: #C6D1CD;
+    --line-soft: #DCE4E1;
+    --teal: #1B6E68;
+    --teal-dark: #144F4B;
+    --amber: #C07A22;
+    --amber-soft: #F2DFC0;
+    --err: #A6402F;
+    --ok: #1B6E68;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  /* ---- Site header ---- */
+  .site-header { background: #FFFFFF; border-bottom: 1px solid var(--line-soft); }
+  .site-header-inner {
+    max-width: 1180px; margin: 0 auto; padding: 18px 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand-icon { width: 46px; height: 46px; flex: none; }
+  .brand-divider { width: 1px; height: 34px; background: var(--line); flex: none; }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-name { font-size: 17px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.15; text-transform: uppercase; }
+  .brand-name .line1 { color: var(--ink); display: block; }
+  .brand-name .line2 { color: var(--teal); display: block; }
+  .brand-tagline { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .header-badge {
+    margin-left: auto; font-size: 12px; font-weight: 700; color: var(--teal-dark);
+    background: var(--amber-soft); border: 1px solid var(--amber);
+    padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  @media (max-width: 620px) { .brand-tagline { display: none; } .site-header-inner { padding: 14px 16px; } }
+
+  /* ---- Page layout ---- */
+  .wrap { max-width: 820px; margin: 0 auto; padding: 48px 20px 80px; }
+  .page-intro { max-width: 680px; margin-bottom: 28px; }
+  .section-eyebrow {
+    margin: 0 0 14px; color: var(--teal-dark); font-size: 13px; font-weight: 800;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .page-title { margin: 0; font-size: clamp(26px, 4vw, 32px); font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
+  .section-accent { width: 56px; height: 4px; margin: 20px 0; border-radius: 999px; background: var(--teal); }
+  .page-lede { margin: 0 0 16px; font-size: 15px; color: var(--muted); max-width: 62ch; }
+
+  .privacy-note {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: #EAF3F2; border: 1px solid var(--line-soft); border-radius: 8px;
+    padding: 12px 14px; font-size: 13px; color: var(--ink); max-width: 62ch;
+  }
+  .privacy-note svg { width: 18px; height: 18px; flex: none; stroke: var(--teal-dark); margin-top: 1px; }
+
+  /* ---- Panels ---- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 26px; margin: 20px 0; transition: opacity 0.2s ease;
+  }
+  .panel[data-disabled="true"] { opacity: 0.45; pointer-events: none; }
+
+  .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .step-num {
+    width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--teal);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px;
+  }
+  .panel-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+
+  /* ---- File drop zone ---- */
+  .drop-zone {
+    border: 2px dashed var(--line); border-radius: 8px; padding: 32px 20px;
+    text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--teal); background: #EAF3F2; }
+  .drop-zone svg { width: 32px; height: 32px; stroke: var(--teal-dark); margin-bottom: 10px; }
+  .drop-zone p { margin: 0; font-size: 14px; color: var(--muted); }
+  .drop-zone p.filename { font-weight: 700; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+  #fileInput { display: none; }
+
+  .field-message {
+    font-size: 13px; margin-top: 10px; padding: 10px 12px; border-radius: 6px; display: none;
+  }
+  .field-message.error { display: block; background: #FDECEA; color: var(--err); }
+  .field-message.success { display: block; background: #EAF3F2; color: var(--teal-dark); }
+
+  /* ---- Tables ---- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line-soft); border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; white-space: nowrap; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+  th { background: var(--bg); color: var(--teal-dark); font-weight: 700; position: sticky; top: 0; }
+  tr:last-child td { border-bottom: none; }
+  td.new-col, th.new-col { background: #EAF3F2; font-family: 'IBM Plex Mono', monospace; }
+  .table-caption { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+
+  /* ---- Mapping grid ---- */
+  .map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .map-grid { grid-template-columns: 1fr; } }
+  .map-field label {
+    display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px;
+  }
+  .map-field select {
+    width: 100%; padding: 9px 11px; font-size: 14px; font-family: inherit;
+    border: 1.5px solid var(--line); border-radius: var(--radius); background: #fff; color: var(--ink);
+  }
+  .map-field select:focus { outline: none; border-color: var(--teal); }
+
+  .dob-format-row { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line-soft); }
+  .dob-format-row label { display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .dob-format-row select { padding: 9px 11px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--line); border-radius: var(--radius); }
+  .dob-format-row p { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
+
+  .tech-note {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 26px; margin: 20px 0;
+  }
+  .tech-note-title {
+    font-size: 13px; font-weight: 700; color: var(--teal-dark);
+    text-transform: uppercase; letter-spacing: .04em; margin: 0 0 10px;
+  }
+  .tech-note-subtitle {
+    font-size: 13px; font-weight: 700; color: var(--teal-dark);
+    text-transform: uppercase; letter-spacing: .04em; margin: 20px 0 10px;
+  }
+  .tech-note p { font-size: 13.5px; color: var(--ink); margin: 0 0 12px; max-width: 62ch; }
+  .tech-note p.requirements { color: var(--ink); font-weight: 600; }
+  .tech-note table { border-collapse: collapse; font-size: 12.5px; }
+  .tech-note th, .tech-note td { padding: 6px 12px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+  .tech-note th { color: var(--teal-dark); font-weight: 700; }
+  .tech-note td code {
+    font-family: 'IBM Plex Mono', monospace; background: var(--bg);
+    padding: 1px 5px; border-radius: 3px; font-size: 12px;
+  }
+
+  .gap-footer {
+    text-align: center; margin: 56px 0 0; padding-top: 40px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .gap-symbol-large { width: 84px; height: 84px; display: block; margin: 0 auto 16px; }
+  .gap-footer p {
+    margin: 0; font-size: 14px; font-weight: 700; color: var(--teal-dark); max-width: 46ch;
+    margin-left: auto; margin-right: auto;
+  }
+
+  /* ---- Buttons ---- */
+  .cta-pill {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--teal); color: #fff; font-family: inherit; font-weight: 700; font-size: 15px;
+    border: none; padding: 12px 22px; border-radius: 999px; cursor: pointer;
+  }
+  .cta-pill:hover { background: var(--teal-dark); }
+  .cta-pill:disabled { background: var(--line); cursor: not-allowed; }
+  .cta-pill svg { width: 16px; height: 16px; }
+
+  .cta-pill.secondary { background: #fff; color: var(--teal-dark); border: 1.5px solid var(--teal); }
+  .cta-pill.secondary:hover { background: #EAF3F2; }
+  .cta-pill.secondary:disabled { background: #fff; color: var(--line); border-color: var(--line); cursor: not-allowed; }
+
+  .results-summary {
+    display: flex; gap: 24px; flex-wrap: wrap; margin: 4px 0 18px;
+  }
+  .results-stat { font-size: 13px; color: var(--muted); }
+  .results-stat strong { display: block; font-size: 22px; color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+  .results-stat.warn strong { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 8.5C11 7.12 12.12 6 13.5 6H31C32.66 6 34 7.34 34 9V38C34 39.1 33.1 40 32 40H14.5C12.57 40 11 38.43 11 36.5V8.5Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M11 34.5C11 33.12 12.12 32 13.5 32H34V36.5C34 38.43 32.43 40 30.5 40H13.5C12.12 40 11 38.88 11 37.5V34.5Z" fill="var(--ink)" fill-opacity="0.06" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M22.5 13L28.5 15.1V19.3C28.5 23 26 25.9 22.5 27C19 25.9 16.5 23 16.5 19.3V15.1L22.5 13Z" fill="var(--teal)"/>
+        <circle cx="22.5" cy="18.3" r="1.9" fill="#fff"/>
+        <path d="M19.3 22.5C19.3 20.6 20.7 19.6 22.5 19.6C24.3 19.6 25.7 20.6 25.7 22.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-divider"></div>
+      <div class="brand-text">
+        <span class="brand-name"><span class="line1">My Health</span><span class="line2">Passport</span></span>
+        <span class="brand-tagline">Your health research identity. Your choice.</span>
+      </div>
+    </div>
+    <span class="header-badge">For Data Managers</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <header class="page-intro">
+    <p class="section-eyebrow">Bulk SLK-581 generation</p>
+    <h1 class="page-title">CSV Batch Generator</h1>
+    <div class="section-accent" aria-hidden="true"></div>
+    <p class="page-lede">Upload a CSV of records, map the columns that hold name, date of birth, and sex, and generate an SLK-581 statistical linkage key for every row — using the same construction rules as the rest of the My Health Passport toolset.</p>
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      <span><strong>Nothing is uploaded.</strong> This file never leaves your device — it's read, processed, and re-saved entirely in your browser. This page has no server, and loads no external code beyond fonts.</span>
+    </div>
+  </header>
+
+  <!-- Step 1: Open file -->
+  <div class="panel" id="panelUpload">
+    <div class="panel-header"><span class="step-num">1</span><span class="panel-title">Open your CSV file</span></div>
+    <div class="drop-zone" id="dropZone">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      <p class="filename" id="dropFilename" style="display:none;"></p>
+      <p id="dropInstruction">Click to browse, or drag a .csv file here</p>
+    </div>
+    <input type="file" id="fileInput" accept=".csv,text/csv">
+    <div class="field-message" id="uploadMessage"></div>
+  </div>
+
+  <!-- Step 2: Preview -->
+  <div class="panel" id="panelPreview" data-disabled="true">
+    <div class="panel-header"><span class="step-num">2</span><span class="panel-title">Preview your data</span></div>
+    <div class="table-scroll"><table id="previewTable"></table></div>
+    <p class="table-caption" id="previewCaption"></p>
+  </div>
+
+  <!-- Step 3: Mapping -->
+  <div class="panel" id="panelMapping" data-disabled="true">
+    <div class="panel-header"><span class="step-num">3</span><span class="panel-title">Map your columns</span></div>
+    <div class="map-grid">
+      <div class="map-field">
+        <label for="mapUniqueId">Unique ID</label>
+        <select id="mapUniqueId"></select>
+      </div>
+      <div class="map-field">
+        <label for="mapFirstName">First Name</label>
+        <select id="mapFirstName"></select>
+      </div>
+      <div class="map-field">
+        <label for="mapLastName">Last Name</label>
+        <select id="mapLastName"></select>
+      </div>
+      <div class="map-field">
+        <label for="mapDob">DOB</label>
+        <select id="mapDob"></select>
+      </div>
+      <div class="map-field">
+        <label for="mapGender">Gender</label>
+        <select id="mapGender"></select>
+      </div>
+    </div>
+    <div class="dob-format-row">
+      <label for="dobFormat">Date of birth format in this file</label>
+      <select id="dobFormat">
+        <option value="dmy">DD/MM/YYYY</option>
+        <option value="iso">YYYY-MM-DD</option>
+        <option value="mdy">MM/DD/YYYY</option>
+      </select>
+      <p>Used to correctly read the DOB column above. Accepts <code>/</code>, <code>-</code>, or <code>.</code> as separators.</p>
+    </div>
+    <div class="field-message" id="mappingMessage"></div>
+  </div>
+
+  <!-- Step 4: Generate & download -->
+  <div class="panel" id="panelGenerate" data-disabled="true">
+    <div class="panel-header"><span class="step-num">4</span><span class="panel-title">Generate &amp; download</span></div>
+    <button class="cta-pill" id="generateBtn" type="button">Generate SLK-581 column</button>
+
+    <div id="resultsArea" style="display:none; margin-top: 20px;">
+      <div class="results-summary">
+        <div class="results-stat"><strong id="statTotal">0</strong>total rows</div>
+        <div class="results-stat"><strong id="statOk">0</strong>keys generated</div>
+        <div class="results-stat warn"><strong id="statFail">0</strong>rows skipped</div>
+      </div>
+      <div class="table-scroll"><table id="resultTable"></table></div>
+      <p class="table-caption" id="resultCaption"></p>
+      <div style="margin-top: 18px;">
+        <button class="cta-pill secondary" id="downloadBtn" type="button">Download CSV with SLK-581 column</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="gap-footer">
+    <svg class="gap-symbol-large" viewBox="230 45 250 250" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="355" cy="170" r="125" fill="#ffffff" stroke="#1E2A27" stroke-width="3"/>
+
+      <line x1="280" y1="245" x2="320" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+      <line x1="320" y1="205" x2="320" y2="95" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+      <line x1="320" y1="205" x2="430" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+
+      <polygon points="280,135 390,135 430,95 320,95" fill="#1B6E68" fill-opacity="0.22" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+      <polygon points="390,135 390,245 430,205 430,95" fill="#1B6E68" fill-opacity="0.28" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+      <polygon points="280,135 390,135 390,245 280,245" fill="#1B6E68" fill-opacity="0.14" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+
+      <polygon points="325,155 370,155 386,139 341,139" fill="#1B6E68" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      <polygon points="370,155 370,200 386,184 386,139" fill="#0F3A36" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      <polygon points="325,155 370,155 370,200 325,200" fill="#144F4B" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+    </svg>
+    <p>This page is 100% Air-Gap capable. No degradation of function in working in a gapped environment.</p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------------------------------------------------------
+  // CSV parsing / serialising (hand-written — no external library)
+  // ---------------------------------------------------------------
+  function parseCsv(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    let i = 0;
+    const len = text.length;
+
+    while (i < len) {
+      const c = text[i];
+
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        }
+        field += c; i++; continue;
+      }
+
+      if (c === '"') { inQuotes = true; i++; continue; }
+      if (c === ',') { row.push(field); field = ''; i++; continue; }
+      if (c === '\r') { i++; continue; }
+      if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+      field += c; i++;
+    }
+    // final field/row (file may not end with a newline)
+    if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+
+    // drop fully-empty trailing rows (common with a trailing newline)
+    while (rows.length && rows[rows.length - 1].every(f => f === '')) rows.pop();
+
+    return rows;
+  }
+
+  function csvEscape(value) {
+    const s = value === null || value === undefined ? '' : String(value);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function serialiseCsv(rows) {
+    return rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+  }
+
+  // ---------------------------------------------------------------
+  // SLK-581 construction (same rules as index.html)
+  // ---------------------------------------------------------------
+  function extractLetters(raw, positions) {
+    const alphaOnly = (raw || '').toString().toUpperCase().replace(/[^A-Z]/g, '');
+    return positions.map(p => alphaOnly[p - 1] || null);
+  }
+
+  function normaliseGender(raw) {
+    const v = (raw || '').toString().trim().toLowerCase();
+    if (['1', 'm', 'male'].includes(v)) return '1';
+    if (['2', 'f', 'female'].includes(v)) return '2';
+    if (['3', 'i', 'x', 'intersex', 'indeterminate'].includes(v)) return '3';
+    return '9';
+  }
+
+  function parseDob(raw, format) {
+    const v = (raw || '').toString().trim();
+    if (!v) return null;
+    let m, day, month, year;
+    if (format === 'iso') {
+      m = v.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+      if (m) { year = m[1]; month = m[2]; day = m[3]; }
+    } else if (format === 'mdy') {
+      m = v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);
+      if (m) { month = m[1]; day = m[2]; year = m[3]; }
+    } else {
+      m = v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);
+      if (m) { day = m[1]; month = m[2]; year = m[3]; }
+    }
+    if (!day || !month || !year) return null;
+    day = day.padStart(2, '0');
+    month = month.padStart(2, '0');
+    const dayNum = parseInt(day, 10), monthNum = parseInt(month, 10), yearNum = parseInt(year, 10);
+    if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) return null;
+
+    // Reject impossible calendar dates (e.g. 31 February) rather than silently accepting them
+    const check = new Date(Date.UTC(yearNum, monthNum - 1, dayNum));
+    if (check.getUTCFullYear() !== yearNum || check.getUTCMonth() !== monthNum - 1 || check.getUTCDate() !== dayNum) {
+      return null;
+    }
+
+    return day + month + year;
+  }
+
+  function buildSlk581(surname, given, dobRaw, genderRaw, dobFormat) {
+    const hasSurname = (surname || '').toString().replace(/[^A-Za-z]/g, '').length > 0;
+    const surnameChars = hasSurname
+      ? extractLetters(surname, [2, 3, 5]).map(c => c || '2')
+      : null;
+
+    const hasGiven = (given || '').toString().replace(/[^A-Za-z]/g, '').length > 0;
+    const givenChars = hasGiven
+      ? extractLetters(given, [2, 3]).map(c => c || '2')
+      : null;
+
+    const dobStr = parseDob(dobRaw, dobFormat);
+    const genderChar = normaliseGender(genderRaw);
+
+    if (!surnameChars || !givenChars || !dobStr) return null;
+    return surnameChars.join('') + givenChars.join('') + dobStr + genderChar;
+  }
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  let csvRows = [];   // full parsed data, including header row at index 0
+  let headers = [];
+
+  // ---------------------------------------------------------------
+  // Elements
+  // ---------------------------------------------------------------
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const dropFilename = document.getElementById('dropFilename');
+  const dropInstruction = document.getElementById('dropInstruction');
+  const uploadMessage = document.getElementById('uploadMessage');
+
+  const panelPreview = document.getElementById('panelPreview');
+  const previewTable = document.getElementById('previewTable');
+  const previewCaption = document.getElementById('previewCaption');
+
+  const panelMapping = document.getElementById('panelMapping');
+  const mapUniqueId = document.getElementById('mapUniqueId');
+  const mapFirstName = document.getElementById('mapFirstName');
+  const mapLastName = document.getElementById('mapLastName');
+  const mapDob = document.getElementById('mapDob');
+  const mapGender = document.getElementById('mapGender');
+  const dobFormat = document.getElementById('dobFormat');
+  const mappingMessage = document.getElementById('mappingMessage');
+
+  const panelGenerate = document.getElementById('panelGenerate');
+  const generateBtn = document.getElementById('generateBtn');
+  const resultsArea = document.getElementById('resultsArea');
+  const statTotal = document.getElementById('statTotal');
+  const statOk = document.getElementById('statOk');
+  const statFail = document.getElementById('statFail');
+  const resultTable = document.getElementById('resultTable');
+  const resultCaption = document.getElementById('resultCaption');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  let outputRows = null; // set once generation has run
+
+  // ---------------------------------------------------------------
+  // File handling
+  // ---------------------------------------------------------------
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+  });
+
+  function showUploadMessage(text, type) {
+    uploadMessage.textContent = text;
+    uploadMessage.className = 'field-message ' + type;
+  }
+
+  function resetDownstream() {
+    panelPreview.dataset.disabled = 'true';
+    panelMapping.dataset.disabled = 'true';
+    panelGenerate.dataset.disabled = 'true';
+    resultsArea.style.display = 'none';
+    outputRows = null;
+  }
+
+  function handleFile(file) {
+    resetDownstream();
+    uploadMessage.className = 'field-message';
+
+    if (!/\.csv$/i.test(file.name)) {
+      showUploadMessage('Please choose a .csv file.', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rows = parseCsv(String(reader.result));
+
+      if (rows.length < 2) {
+        showUploadMessage('This file needs a header row plus at least one data row.', 'error');
+        return;
+      }
+
+      const colCount = rows[0].length;
+      if (colCount < 5) {
+        showUploadMessage(
+          `This file has ${colCount} column${colCount === 1 ? '' : 's'}. A minimum of 5 columns is required (Unique ID, First Name, Last Name, DOB, Gender).`,
+          'error'
+        );
+        return;
+      }
+
+      csvRows = rows;
+      headers = rows[0];
+
+      dropFilename.textContent = file.name;
+      dropFilename.style.display = 'block';
+      dropInstruction.textContent = 'Click to choose a different file';
+      showUploadMessage(`Loaded ${rows.length - 1} data row${rows.length - 1 === 1 ? '' : 's'} across ${colCount} columns.`, 'success');
+
+      renderPreview();
+      populateMappingDropdowns();
+      panelPreview.dataset.disabled = 'false';
+      panelMapping.dataset.disabled = 'false';
+      panelGenerate.dataset.disabled = 'false';
+    };
+    reader.onerror = () => showUploadMessage('Could not read that file — please try again.', 'error');
+    reader.readAsText(file);
+  }
+
+  // ---------------------------------------------------------------
+  // Preview (first 5 data rows)
+  // ---------------------------------------------------------------
+  function renderTable(target, headerRow, dataRows, newColIndex) {
+    let html = '<thead><tr>';
+    headerRow.forEach((h, i) => {
+      html += `<th class="${i === newColIndex ? 'new-col' : ''}">${escapeHtml(h)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    dataRows.forEach(r => {
+      html += '<tr>';
+      headerRow.forEach((_, i) => {
+        html += `<td class="${i === newColIndex ? 'new-col' : ''}">${escapeHtml(r[i] || '')}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    target.innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderPreview() {
+    const dataRows = csvRows.slice(1, 6);
+    renderTable(previewTable, headers, dataRows, -1);
+    previewCaption.textContent = `Showing ${dataRows.length} of ${csvRows.length - 1} data rows.`;
+  }
+
+  // ---------------------------------------------------------------
+  // Mapping dropdowns
+  // ---------------------------------------------------------------
+  function populateMappingDropdowns() {
+    [mapUniqueId, mapFirstName, mapLastName, mapDob, mapGender].forEach(sel => {
+      sel.innerHTML = '<option value="">Select a column…</option>' +
+        headers.map((h, i) => `<option value="${i}">${escapeHtml(h)}</option>`).join('');
+    });
+  }
+
+  function getMapping() {
+    return {
+      uniqueId: mapUniqueId.value,
+      firstName: mapFirstName.value,
+      lastName: mapLastName.value,
+      dob: mapDob.value,
+      gender: mapGender.value
+    };
+  }
+
+  function validateMapping() {
+    const m = getMapping();
+    const values = Object.values(m);
+    if (values.some(v => v === '')) {
+      mappingMessage.textContent = 'Please map all five fields before generating.';
+      mappingMessage.className = 'field-message error';
+      return false;
+    }
+    if (new Set(values).size !== values.length) {
+      mappingMessage.textContent = 'Each field must be mapped to a different column.';
+      mappingMessage.className = 'field-message error';
+      return false;
+    }
+    mappingMessage.className = 'field-message';
+    return true;
+  }
+
+  // ---------------------------------------------------------------
+  // Generate
+  // ---------------------------------------------------------------
+  generateBtn.addEventListener('click', () => {
+    if (!validateMapping()) return;
+    const m = getMapping();
+    const format = dobFormat.value;
+
+    const uniqueIdHeader = headers[parseInt(m.uniqueId, 10)];
+    const newHeaders = [uniqueIdHeader, 'SLK-581'];
+    const newRows = [newHeaders];
+    let okCount = 0, failCount = 0;
+
+    for (let r = 1; r < csvRows.length; r++) {
+      const row = csvRows[r];
+      const key = buildSlk581(
+        row[m.lastName],
+        row[m.firstName],
+        row[m.dob],
+        row[m.gender],
+        format
+      );
+      if (key) okCount++; else failCount++;
+      newRows.push([row[m.uniqueId], key || '']);
+    }
+
+    outputRows = newRows;
+
+    statTotal.textContent = csvRows.length - 1;
+    statOk.textContent = okCount;
+    statFail.textContent = failCount;
+
+    const previewDataRows = newRows.slice(1, 6);
+    renderTable(resultTable, newHeaders, previewDataRows, newHeaders.length - 1);
+    resultCaption.textContent = failCount > 0
+      ? `${failCount} row${failCount === 1 ? '' : 's'} skipped — usually an unparseable or missing date of birth.`
+      : 'Every row generated successfully.';
+
+    resultsArea.style.display = 'block';
+  });
+
+  // ---------------------------------------------------------------
+  // Download
+  // ---------------------------------------------------------------
+  downloadBtn.addEventListener('click', () => {
+    if (!outputRows) return;
+    const csvText = serialiseCsv(outputRows);
+    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'slk581_output.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+})();
+</script>
+
+</body>
+</html>

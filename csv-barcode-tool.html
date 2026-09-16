@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linking Key Table Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F6F4;
+    --panel: #FFFFFF;
+    --border: #DCE2DD;
+    --border-strong: #C4CCC5;
+    --text: #1B211F;
+    --muted: #5B655F;
+    --accent: #235B5A;
+    --accent-hover: #1B4645;
+    --accent-soft: #E7EFEE;
+    --warn-bg: #FBF3E7;
+    --warn-text: #7A5416;
+    --row-alt: #FAFBFA;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    padding: 48px 24px 96px;
+  }
+  .wrap{
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  h1{
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle{
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 6px;
+    max-width: 62ch;
+    line-height: 1.5;
+  }
+  .subtitle.privacy-note{
+    margin: 0 0 6px;
+    font-size: 13px;
+  }
+  .subtitle.capacity-note{
+    margin: 0 0 36px;
+    font-size: 13px;
+    max-width: 68ch;
+  }
+  .step{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .step-head{
+    display:flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .step-num{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-title{
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .step-body{
+    padding-left: 32px;
+  }
+  .btn{
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .btn:hover:not(:disabled){ background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn:disabled{
+    background: #E4E7E5;
+    border-color: #E4E7E5;
+    color: #97A19B;
+    cursor: not-allowed;
+  }
+  .btn-secondary{
+    background: transparent;
+    color: var(--accent);
+  }
+  .btn-secondary:hover:not(:disabled){ background: var(--accent-soft); }
+  input[type="file"]{ display:none; }
+  .file-info{
+    margin-top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size: 14px;
+    margin: 14px 0 4px;
+  }
+  .toggle-row input{
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+  }
+  .hint{
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .table-scroll{
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-top: 14px;
+  }
+  table{
+    border-collapse: collapse;
+    width: 100%;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+  th, td{
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  thead th{
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  tbody tr:nth-child(even){ background: var(--row-alt); }
+  .barcode-col{ color: var(--accent); }
+  .empty-note{
+    font-size: 13px;
+    color: var(--muted);
+    padding: 18px 2px;
+  }
+  .status{
+    font-size: 12.5px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: none;
+  }
+  .status.show{ display:block; }
+  .status.warn{ background: var(--warn-bg); color: var(--warn-text); }
+  .status.ok{ background: var(--accent-soft); color: var(--accent-hover); }
+  .row-actions{
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items:center;
+  }
+  .meta-line{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  .modal-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(27, 33, 31, 0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 100;
+  }
+  .modal-overlay.show{ display: flex; }
+  .modal-box{
+    background: var(--panel);
+    border-radius: 6px;
+    max-width: 420px;
+    width: 100%;
+    padding: 26px 28px;
+    box-shadow: 0 12px 32px rgba(27, 33, 31, 0.22);
+  }
+  .modal-title{
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .modal-detail{
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0 0 20px;
+  }
+  .info-box{
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--accent-hover);
+    line-height: 1.5;
+  }
+  .panel-head{
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .panel-title{
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .save-controls{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+  }
+  .filename-input{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    background: #fff;
+    width: 220px;
+  }
+  .filename-input:focus{
+    outline: none;
+    border-color: var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Linking Key Table Generator</h1>
+  <p class="subtitle">This tool converts an existing set of SLK-581 statistical linkage keys into My Health Passport Barcodes, generated as one-way SHA-256 hashes.</p>
+  <p class="subtitle">The output is a linkage table: each row pairs an original SLK-581 with its corresponding My Health Passport Barcode, allowing the two to be linked against your current SLK-581-enabled health datasets.</p>
+  <p class="subtitle privacy-note">All data is transformed locally within your dashboard, in your browser. No data is transferred to our servers, or recorded in the cloud.</p>
+  <p class="subtitle capacity-note">This converter is designed for small, Excel-spreadsheet-sized projects — everything is held in your browser's working memory rather than processed in chunks on a server. <strong>Recommended for batches of less than 250,000 rows.</strong> Larger files may slow down or strain the browser, especially on older or memory-constrained devices; for anything approaching that scale, consider using our SQL-based coding approaches instead.</p>
+
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">1</span>
+      <span class="step-title">Open a CSV file</span>
+    </div>
+    <div class="step-body">
+      <button class="btn" id="openBtn">Open CSV file&hellip;</button>
+      <input type="file" id="fileInput" accept=".csv,text/csv">
+      <div class="file-info" id="fileInfo">No file selected.</div>
+      <div class="info-box">Export SLK-581s in a single column, CSV file.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">2</span>
+      <span class="step-title">Preview your source file.</span>
+    </div>
+    <div class="step-body">
+      <label class="toggle-row">
+        <input type="checkbox" id="headerToggle" checked>
+        My table has headers
+      </label>
+      <div class="hint">Controls whether the first row is treated as a header, both in the preview and in the new column's name.</div>
+      <div class="table-scroll" id="previewWrap">
+        <div class="empty-note">Open a CSV file to see a preview of the first 5 rows here.</div>
+      </div>
+      <div class="meta-line" id="previewNote"></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">3</span>
+      <span class="step-title">Generate Barcodes (One Way Encode)</span>
+    </div>
+    <div class="step-body">
+      <div class="row-actions">
+        <button class="btn" id="hashBtn" disabled>Generate Barcodes (One Way Encode)</button>
+      </div>
+      <div class="hint">Inserts a new second column containing the SHA-256 hash of each row's first-column value, computed across the entire file (not just the preview). Before hashing, that value is uppercased and has all spaces removed — the original first column is left untouched.</div>
+      <div class="status" id="hashStatus"></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">4</span>
+      <span class="step-title">Save the result</span>
+    </div>
+    <div class="step-body">
+      <div class="panel-head">
+        <span class="panel-title">Post Encoding File Preview</span>
+        <div class="save-controls">
+          <input type="text" id="saveNameInput" class="filename-input" placeholder="filename.csv" spellcheck="false">
+          <button class="btn btn-secondary" id="saveBtn" disabled>Save as&hellip;</button>
+        </div>
+      </div>
+      <div class="table-scroll" id="postPreviewWrap">
+        <div class="empty-note">Generate the Barcode column to see a preview of the encoded file here.</div>
+      </div>
+      <div class="meta-line" id="postPreviewNote"></div>
+      <div class="hint">Exports the full file, including the Barcode column, as a new CSV. Edit the file name above before saving if you'd like.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="modalTitle">
+    <p class="modal-title" id="modalTitle">Your file does not appear to be formatted correctly</p>
+    <p class="modal-detail" id="modalDetail"></p>
+    <button class="btn" id="modalAckBtn">Acknowledge</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const openBtn = document.getElementById('openBtn');
+  const fileInput = document.getElementById('fileInput');
+  const fileInfo = document.getElementById('fileInfo');
+  const headerToggle = document.getElementById('headerToggle');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewNote = document.getElementById('previewNote');
+  const postPreviewWrap = document.getElementById('postPreviewWrap');
+  const postPreviewNote = document.getElementById('postPreviewNote');
+  const saveNameInput = document.getElementById('saveNameInput');
+  const hashBtn = document.getElementById('hashBtn');
+  const hashStatus = document.getElementById('hashStatus');
+  const saveBtn = document.getElementById('saveBtn');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalDetail = document.getElementById('modalDetail');
+  const modalAckBtn = document.getElementById('modalAckBtn');
+
+  let rows = [];        // full parsed data, array of arrays of strings
+  let sourceName = '';
+  let barcodeAdded = false;
+
+  openBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    sourceName = file.name;
+    barcodeAdded = false;
+    hashBtn.disabled = false;
+    hashBtn.textContent = 'Generate Barcodes (One Way Encode)';
+    saveBtn.disabled = true;
+    saveNameInput.value = suggestFileName(sourceName);
+    hideStatus();
+
+    try {
+      const text = await file.text();
+      rows = parseCSV(text);
+      fileInfo.textContent = `${file.name} — ${rows.length} row${rows.length === 1 ? '' : 's'} loaded`;
+      renderPreview();
+      renderPostPreview();
+      validateFile(rows);
+    } catch (err) {
+      fileInfo.textContent = `Could not read ${file.name}: ${err.message}`;
+      rows = [];
+      hashBtn.disabled = true;
+      renderPreview();
+      renderPostPreview();
+    }
+  });
+
+  headerToggle.addEventListener('change', () => {
+    renderPreview();
+    renderPostPreview();
+  });
+
+  hashBtn.addEventListener('click', async () => {
+    if (!rows.length) return;
+    hashBtn.disabled = true;
+    hashBtn.textContent = 'Generating…';
+
+    try {
+      const hasHeaders = headerToggle.checked;
+      const startIdx = hasHeaders ? 1 : 0;
+
+      const hashes = await Promise.all(
+        rows.slice(startIdx).map(r => sha256Hex(normalizeForHash(r[0] ?? '')))
+      );
+
+      // Insert as column index 1 (i.e. the new "column two")
+      let h = 0;
+      for (let i = 0; i < rows.length; i++) {
+        if (hasHeaders && i === 0) {
+          rows[i].splice(1, 0, 'Barcode');
+        } else {
+          rows[i].splice(1, 0, hashes[h++]);
+        }
+      }
+
+      barcodeAdded = true;
+      hashBtn.textContent = 'Barcodes generated';
+      saveBtn.disabled = false;
+      if (!saveNameInput.value.trim()) saveNameInput.value = suggestFileName(sourceName);
+      showStatus(`ok`, `Added a Barcode column to all ${rows.length} row${rows.length === 1 ? '' : 's'}.`);
+      renderPreview();
+      renderPostPreview();
+    } catch (err) {
+      hashBtn.disabled = false;
+      hashBtn.textContent = 'Generate Barcodes (One Way Encode)';
+      showStatus('warn', `Could not hash the file: ${err.message}`);
+    }
+  });
+
+  saveBtn.addEventListener('click', async () => {
+    const csvText = toCSV(rows);
+    const suggestedName = ensureCsvExtension(saveNameInput.value || suggestFileName(sourceName));
+    saveNameInput.value = suggestedName;
+
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName,
+          types: [{ description: 'CSV file', accept: { 'text/csv': ['.csv'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(csvText);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return; // user cancelled
+        // fall through to download fallback
+      }
+    }
+
+    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = suggestedName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  function ensureCsvExtension(name) {
+    const trimmed = String(name).trim();
+    if (!trimmed) return 'export.csv';
+    return /\.csv$/i.test(trimmed) ? trimmed : `${trimmed}.csv`;
+  }
+
+  function validateFile(data) {
+    if (!data.length) return;
+
+    const problems = [];
+
+    // Rule 1: exactly one column of data throughout the file.
+    const multiColRows = data.filter(r => r.length !== 1).length;
+    if (multiColRows > 0) {
+      problems.push('the file has more than one column');
+    }
+
+    // Rules 2 & 3 apply to every row except the first.
+    const dataRows = data.slice(1);
+    const alnumOnly = /^[A-Za-z0-9]+$/;
+    const hasLetter = /[A-Za-z]/;
+    const hasNumber = /[0-9]/;
+
+    let symbolRows = 0;
+    let notMixedRows = 0;
+
+    dataRows.forEach(r => {
+      const val = (r[0] ?? '').trim();
+      if (!alnumOnly.test(val)) symbolRows++;
+      else if (!(hasLetter.test(val) && hasNumber.test(val))) notMixedRows++;
+    });
+
+    if (symbolRows > 0) {
+      problems.push(`${symbolRows} row${symbolRows === 1 ? '' : 's'} contain symbols or punctuation`);
+    }
+    if (notMixedRows > 0) {
+      problems.push(`${notMixedRows} row${notMixedRows === 1 ? '' : 's'} lack a mix of letters and numbers`);
+    }
+
+    if (problems.length) {
+      showValidationModal(problems);
+    }
+  }
+
+  function showValidationModal(problems) {
+    modalDetail.textContent = 'Issue found: ' + problems.join('; ') + '.';
+    modalOverlay.classList.add('show');
+  }
+
+  modalAckBtn.addEventListener('click', () => {
+    modalOverlay.classList.remove('show');
+  });
+
+  function suggestFileName(name) {
+    if (!name) return 'export.csv';
+    const base = name.replace(/\.csv$/i, '');
+    return `${base}-barcoded.csv`;
+  }
+
+  function showStatus(kind, msg) {
+    hashStatus.textContent = msg;
+    hashStatus.className = `status show ${kind}`;
+  }
+  function hideStatus() {
+    hashStatus.className = 'status';
+  }
+
+  function renderPreview() {
+    renderTableInto(previewWrap, previewNote, rows, headerToggle.checked, barcodeAdded ? 1 : -1,
+      'Open a CSV file to see a preview of the first 5 rows here.');
+  }
+
+  function renderPostPreview() {
+    if (!barcodeAdded) {
+      postPreviewWrap.innerHTML = '<div class="empty-note">Generate the Barcode column to see a preview of the encoded file here.</div>';
+      postPreviewNote.textContent = '';
+      return;
+    }
+    renderTableInto(postPreviewWrap, postPreviewNote, rows, headerToggle.checked, 1,
+      'Generate the Barcode column to see a preview of the encoded file here.');
+  }
+
+  function renderTableInto(wrapEl, noteEl, data, hasHeaders, highlightCol, emptyMessage) {
+    if (!data.length) {
+      wrapEl.innerHTML = `<div class="empty-note">${emptyMessage}</div>`;
+      noteEl.textContent = '';
+      return;
+    }
+    const previewRows = data.slice(0, 5);
+
+    let html = '<table>';
+    if (hasHeaders) html += '<thead>';
+    else html += '<tbody>';
+
+    previewRows.forEach((row, idx) => {
+      const isHeaderRow = hasHeaders && idx === 0;
+      const tag = isHeaderRow ? 'th' : 'td';
+
+      if (hasHeaders && idx === 1) html += '</thead><tbody>';
+
+      html += '<tr>';
+      row.forEach((cell, ci) => {
+        const cls = highlightCol === ci ? ' class="barcode-col"' : '';
+        html += `<${tag}${cls}>${escapeHtml(cell)}</${tag}>`;
+      });
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    wrapEl.innerHTML = html;
+    noteEl.textContent = `Showing first ${previewRows.length} of ${data.length} line${data.length === 1 ? '' : 's'} in the file.`;
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function normalizeForHash(str) {
+    // Uppercase and remove all whitespace (spaces, tabs, etc.) before hashing.
+    return String(str).toUpperCase().replace(/\s+/g, '');
+  }
+
+  async function sha256Hex(str) {
+    const enc = new TextEncoder().encode(str);
+    const digest = await crypto.subtle.digest('SHA-256', enc);
+    return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --- CSV parsing (RFC 4180-ish: handles quoted fields, embedded commas/newlines, "" escapes) ---
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    let i = 0;
+    const len = text.length;
+
+    while (i < len) {
+      const c = text[i];
+
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        }
+        field += c; i++; continue;
+      }
+
+      if (c === '"') { inQuotes = true; i++; continue; }
+      if (c === ',') { row.push(field); field = ''; i++; continue; }
+      if (c === '\r') { i++; continue; }
+      if (c === '\n') {
+        row.push(field); field = '';
+        rows.push(row); row = [];
+        i++; continue;
+      }
+      field += c; i++;
+    }
+    // last field/row
+    if (field.length > 0 || row.length > 0) {
+      row.push(field);
+      rows.push(row);
+    }
+    // drop fully-empty trailing rows
+    return rows.filter(r => !(r.length === 1 && r[0] === ''));
+  }
+
+  function toCSV(data) {
+    return data.map(row => row.map(csvEscape).join(',')).join('\r\n');
+  }
+
+  function csvEscape(value) {
+    const str = String(value ?? '');
+    if (/[",\r\n]/.test(str)) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  }
+})();
+</script>
+</body>
+</html>
