@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind the Gap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EDF2F0;
+    --surface: #FBFCFB;
+    --ink: #1E2A27;
+    --muted: #5B6B67;
+    --line: #C6D1CD;
+    --line-soft: #DCE4E1;
+    --teal: #1B6E68;
+    --teal-dark: #144F4B;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  /* ---- Site header ---- */
+  .site-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .site-header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .gap-symbol { width: 44px; height: 44px; flex: none; }
+
+  .gap-symbol-large {
+    width: 96px;
+    height: 96px;
+    display: block;
+    margin: 44px auto 0;
+  }
+
+  .gap-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .gap-title .dim { color: var(--ink); }
+  .gap-title .accent { color: var(--teal); }
+
+  /* ---- Page content ---- */
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 64px 20px 100px;
+  }
+
+  .section-eyebrow {
+    margin: 0 0 14px;
+    color: var(--teal-dark);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .section-accent {
+    width: 56px;
+    height: 4px;
+    margin: 20px 0 28px;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+
+  .intro p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin: 0 0 20px;
+    max-width: 62ch;
+  }
+
+  .intro p.lede {
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .intro strong { color: var(--teal-dark); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <svg class="gap-symbol" viewBox="230 45 250 250" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="355" cy="170" r="125" fill="#ffffff" stroke="#1E2A27" stroke-width="3"/>
+
+      <line x1="280" y1="245" x2="320" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+      <line x1="320" y1="205" x2="320" y2="95" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+      <line x1="320" y1="205" x2="430" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+
+      <polygon points="280,135 390,135 430,95 320,95" fill="#1B6E68" fill-opacity="0.22" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+      <polygon points="390,135 390,245 430,205 430,95" fill="#1B6E68" fill-opacity="0.28" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+      <polygon points="280,135 390,135 390,245 280,245" fill="#1B6E68" fill-opacity="0.14" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+
+      <polygon points="325,155 370,155 386,139 341,139" fill="#1B6E68" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      <polygon points="370,155 370,200 386,184 386,139" fill="#0F3A36" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      <polygon points="325,155 370,155 370,200 325,200" fill="#144F4B" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+    </svg>
+    <span class="gap-title"><span class="dim">Mind the</span> <span class="accent">Gap</span></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="intro">
+    <p class="section-eyebrow">Air-gapped by design</p>
+    <p class="lede">Spy agencies protect their most sensitive work inside a SCIF — a Sensitive Compartmented Information Facility. It is, quite literally, a room within a room: a space physically isolated from the networks and signals surrounding it.</p>
+    <div class="section-accent" aria-hidden="true"></div>
+    <p>Many of our tools are built around the same principle, translated into software. Once downloaded onto a computer, they are ready to perform in similarly isolated, air-gapped conditions — running entirely on their own, with <strong>no ongoing connection to the internet required</strong>.</p>
+    <p>The tool itself becomes the sealed room. Everything it needs to operate travels with it, and nothing it processes has to leave. That is the gap worth minding — the space between a tool that merely claims to protect your data, and one that was never wired to transmit it in the first place.</p>
+    <p>Look out for the Mind the Gap symbol on our tool pages. It marks where you can find out more about how that tool performs within air-gapped data facilities, such as Trusted Research Environments (TREs) and Trusted Data Environments (TDEs).</p>
+
+    <svg class="gap-symbol-large" viewBox="230 45 250 250" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="355" cy="170" r="125" fill="#ffffff" stroke="#1E2A27" stroke-width="3"/>
+
+      <line x1="280" y1="245" x2="320" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+      <line x1="320" y1="205" x2="320" y2="95" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+      <line x1="320" y1="205" x2="430" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+
+      <polygon points="280,135 390,135 430,95 320,95" fill="#1B6E68" fill-opacity="0.22" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+      <polygon points="390,135 390,245 430,205 430,95" fill="#1B6E68" fill-opacity="0.28" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+      <polygon points="280,135 390,135 390,245 280,245" fill="#1B6E68" fill-opacity="0.14" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+
+      <polygon points="325,155 370,155 386,139 341,139" fill="#1B6E68" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      <polygon points="370,155 370,200 386,184 386,139" fill="#0F3A36" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      <polygon points="325,155 370,155 370,200 325,200" fill="#144F4B" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+    </svg>
+  </section>
+</div>
+
+</body>
+</html>
