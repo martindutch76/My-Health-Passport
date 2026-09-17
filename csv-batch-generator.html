@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CSV Batch Generator — My Health Passport</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpath%20d%3D%22M11%208.5C11%207.12%2012.12%206%2013.5%206H31C32.66%206%2034%207.34%2034%209V38C34%2039.1%2033.1%2040%2032%2040H14.5C12.57%2040%2011%2038.43%2011%2036.5V8.5Z%22%20fill%3D%22%23fff%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M11%2034.5C11%2033.12%2012.12%2032%2013.5%2032H34V36.5C34%2038.43%2032.43%2040%2030.5%2040H13.5C12.12%2040%2011%2038.88%2011%2037.5V34.5Z%22%20fill%3D%22%231E2A27%22%20fill-opacity%3D%220.08%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M22.5%2012.5L29%2014.8V19.3C29%2023.3%2026.3%2026.4%2022.5%2027.6C18.7%2026.4%2016%2023.3%2016%2019.3V14.8L22.5%2012.5Z%22%20fill%3D%22%231B6E68%22/%3E%3Ccircle%20cx%3D%2222.5%22%20cy%3D%2218.1%22%20r%3D%222.1%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M19%2022.8C19%2020.7%2020.5%2019.6%2022.5%2019.6C24.5%2019.6%2026%2020.7%2026%2022.8%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -179,6 +179,14 @@
   .cta-pill.secondary:hover { background: #EAF3F2; }
   .cta-pill.secondary:disabled { background: #fff; color: var(--line); border-color: var(--line); cursor: not-allowed; }
 
+  .spinner {
+    width: 14px; height: 14px; flex: none;
+    border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+    border-radius: 50%; display: inline-block;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   .results-summary {
     display: flex; gap: 24px; flex-wrap: wrap; margin: 4px 0 18px;
   }
@@ -221,6 +229,21 @@
       <span><strong>Nothing is uploaded.</strong> This file never leaves your device — it's read, processed, and re-saved entirely in your browser. This page has no server, and loads no external code beyond fonts.</span>
     </div>
   </header>
+
+  <div class="tech-note">
+    <p class="tech-note-title">Technical note — file requirements</p>
+    <p class="requirements">The uploaded file must contain at least 5 columns, and must include a unique record ID, a First Name, Last Name, Date of Birth, and Gender column.</p>
+
+    <p class="tech-note-subtitle">Accepted gender coding</p>
+    <p>SLK-581 defines exactly four sex/gender codes. Matching against your Gender column is case-insensitive and ignores leading/trailing whitespace — <code>"Female"</code>, <code>"FEMALE"</code>, and <code>" female "</code> are all read identically.</p>
+    <table>
+      <tr><th>Code</th><th>Meaning</th><th>Recognised values in your file</th></tr>
+      <tr><td><code>1</code></td><td>Male</td><td><code>1</code>, <code>m</code>, <code>male</code></td></tr>
+      <tr><td><code>2</code></td><td>Female</td><td><code>2</code>, <code>f</code>, <code>female</code></td></tr>
+      <tr><td><code>3</code></td><td>Intersex or indeterminate</td><td><code>3</code>, <code>i</code>, <code>x</code>, <code>intersex</code>, <code>indeterminate</code></td></tr>
+      <tr><td><code>9</code></td><td>Not stated</td><td>Anything else, including a blank cell</td></tr>
+    </table>
+  </div>
 
   <!-- Step 1: Open file -->
   <div class="panel" id="panelUpload">
@@ -281,7 +304,7 @@
   <!-- Step 4: Generate & download -->
   <div class="panel" id="panelGenerate" data-disabled="true">
     <div class="panel-header"><span class="step-num">4</span><span class="panel-title">Generate &amp; download</span></div>
-    <button class="cta-pill" id="generateBtn" type="button">Generate SLK-581 column</button>
+    <button class="cta-pill" id="generateBtn" type="button"><span class="spinner" id="generateSpinner" hidden></span><span id="generateBtnText">Generate SLK-581 column</span></button>
 
     <div id="resultsArea" style="display:none; margin-top: 20px;">
       <div class="results-summary">
@@ -325,118 +348,175 @@
   // ---------------------------------------------------------------
   // CSV parsing / serialising (hand-written — no external library)
   // ---------------------------------------------------------------
-  function parseCsv(text) {
-    const rows = [];
-    let row = [];
-    let field = '';
-    let inQuotes = false;
-    let i = 0;
-    const len = text.length;
+  // ---------------------------------------------------------------
+  // Worker: all CSV parsing and SLK-581 generation happens here,
+  // off the main thread, so the page never freezes on a large file.
+  // Built inline via a Blob URL so this stays one self-contained file.
+  // ---------------------------------------------------------------
+  const workerSource = `
+    let storedRows = [];
 
-    while (i < len) {
-      const c = text[i];
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let field = '';
+      let inQuotes = false;
+      let i = 0;
+      const len = text.length;
 
-      if (inQuotes) {
-        if (c === '"') {
-          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
-          inQuotes = false; i++; continue;
+      while (i < len) {
+        const c = text[i];
+        if (inQuotes) {
+          if (c === '"') {
+            if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+            inQuotes = false; i++; continue;
+          }
+          field += c; i++; continue;
         }
-        field += c; i++; continue;
+        if (c === '"') { inQuotes = true; i++; continue; }
+        if (c === ',') { row.push(field); field = ''; i++; continue; }
+        if (c === '\\r') { i++; continue; }
+        if (c === '\\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+        field += c; i++;
+      }
+      if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+      while (rows.length && rows[rows.length - 1].every(f => f === '')) rows.pop();
+      return rows;
+    }
+
+    function csvEscape(value) {
+      const s = value === null || value === undefined ? '' : String(value);
+      if (/[",\\n\\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+
+    function serialiseCsv(rows) {
+      return rows.map(r => r.map(csvEscape).join(',')).join('\\r\\n');
+    }
+
+    function extractLetters(raw, positions) {
+      const alphaOnly = (raw || '').toString().toUpperCase().replace(/[^A-Z]/g, '');
+      return positions.map(p => alphaOnly[p - 1] || null);
+    }
+
+    function normaliseGender(raw) {
+      const v = (raw || '').toString().trim().toLowerCase();
+      if (['1', 'm', 'male'].includes(v)) return '1';
+      if (['2', 'f', 'female'].includes(v)) return '2';
+      if (['3', 'i', 'x', 'intersex', 'indeterminate'].includes(v)) return '3';
+      return '9';
+    }
+
+    function parseDob(raw, format) {
+      const v = (raw || '').toString().trim();
+      if (!v) return null;
+      let m, day, month, year;
+      if (format === 'iso') {
+        m = v.match(/^(\\d{4})[-\\/.](\\d{1,2})[-\\/.](\\d{1,2})/);
+        if (m) { year = m[1]; month = m[2]; day = m[3]; }
+      } else if (format === 'mdy') {
+        m = v.match(/^(\\d{1,2})[-\\/.](\\d{1,2})[-\\/.](\\d{4})/);
+        if (m) { month = m[1]; day = m[2]; year = m[3]; }
+      } else {
+        m = v.match(/^(\\d{1,2})[-\\/.](\\d{1,2})[-\\/.](\\d{4})/);
+        if (m) { day = m[1]; month = m[2]; year = m[3]; }
+      }
+      if (!day || !month || !year) return null;
+      day = day.padStart(2, '0');
+      month = month.padStart(2, '0');
+      const dayNum = parseInt(day, 10), monthNum = parseInt(month, 10), yearNum = parseInt(year, 10);
+      if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) return null;
+      const check = new Date(Date.UTC(yearNum, monthNum - 1, dayNum));
+      if (check.getUTCFullYear() !== yearNum || check.getUTCMonth() !== monthNum - 1 || check.getUTCDate() !== dayNum) {
+        return null;
+      }
+      return day + month + year;
+    }
+
+    function buildSlk581(surname, given, dobRaw, genderRaw, dobFormat) {
+      const hasSurname = (surname || '').toString().replace(/[^A-Za-z]/g, '').length > 0;
+      const surnameChars = hasSurname ? extractLetters(surname, [2, 3, 5]).map(c => c || '2') : null;
+      const hasGiven = (given || '').toString().replace(/[^A-Za-z]/g, '').length > 0;
+      const givenChars = hasGiven ? extractLetters(given, [2, 3]).map(c => c || '2') : null;
+      const dobStr = parseDob(dobRaw, dobFormat);
+      const genderChar = normaliseGender(genderRaw);
+      if (!surnameChars || !givenChars || !dobStr) return null;
+      return surnameChars.join('') + givenChars.join('') + dobStr + genderChar;
+    }
+
+    self.onmessage = async (e) => {
+      const msg = e.data;
+
+      if (msg.type === 'parse') {
+        try {
+          const text = await msg.file.text();
+          const rows = parseCsv(text);
+
+          if (rows.length < 2) {
+            self.postMessage({ type: 'parsed', ok: false, error: 'This file needs a header row plus at least one data row.' });
+            return;
+          }
+          const colCount = rows[0].length;
+          if (colCount < 5) {
+            self.postMessage({ type: 'parsed', ok: false, error: 'COLCOUNT:' + colCount });
+            return;
+          }
+
+          storedRows = rows;
+          self.postMessage({
+            type: 'parsed', ok: true,
+            headers: rows[0],
+            totalRows: rows.length - 1,
+            colCount: colCount,
+            previewRows: rows.slice(1, 6)
+          });
+        } catch (err) {
+          self.postMessage({ type: 'parsed', ok: false, error: 'Could not read that file — please try again.' });
+        }
+        return;
       }
 
-      if (c === '"') { inQuotes = true; i++; continue; }
-      if (c === ',') { row.push(field); field = ''; i++; continue; }
-      if (c === '\r') { i++; continue; }
-      if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
-      field += c; i++;
-    }
-    // final field/row (file may not end with a newline)
-    if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+      if (msg.type === 'generate') {
+        const m = msg.mapping;
+        const format = msg.dobFormat;
+        const uniqueIdHeader = storedRows[0][parseInt(m.uniqueId, 10)];
+        const newHeaders = [uniqueIdHeader, 'SLK-581'];
+        const newRows = [newHeaders];
+        let okCount = 0, failCount = 0;
+        const total = storedRows.length - 1;
 
-    // drop fully-empty trailing rows (common with a trailing newline)
-    while (rows.length && rows[rows.length - 1].every(f => f === '')) rows.pop();
+        for (let r = 1; r < storedRows.length; r++) {
+          const row = storedRows[r];
+          const key = buildSlk581(row[m.lastName], row[m.firstName], row[m.dob], row[m.gender], format);
+          if (key) okCount++; else failCount++;
+          newRows.push([row[m.uniqueId], key || '']);
 
-    return rows;
-  }
+          if (r % 10000 === 0) {
+            self.postMessage({ type: 'progress', processed: r, total: total });
+          }
+        }
 
-  function csvEscape(value) {
-    const s = value === null || value === undefined ? '' : String(value);
-    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-    return s;
-  }
+        const csvText = serialiseCsv(newRows);
+        self.postMessage({
+          type: 'generated',
+          headers: newHeaders,
+          previewRows: newRows.slice(1, 6),
+          okCount, failCount, total,
+          csvText
+        });
+      }
+    };
+  `;
 
-  function serialiseCsv(rows) {
-    return rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
-  }
-
-  // ---------------------------------------------------------------
-  // SLK-581 construction (same rules as index.html)
-  // ---------------------------------------------------------------
-  function extractLetters(raw, positions) {
-    const alphaOnly = (raw || '').toString().toUpperCase().replace(/[^A-Z]/g, '');
-    return positions.map(p => alphaOnly[p - 1] || null);
-  }
-
-  function normaliseGender(raw) {
-    const v = (raw || '').toString().trim().toLowerCase();
-    if (['1', 'm', 'male'].includes(v)) return '1';
-    if (['2', 'f', 'female'].includes(v)) return '2';
-    if (['3', 'i', 'x', 'intersex', 'indeterminate'].includes(v)) return '3';
-    return '9';
-  }
-
-  function parseDob(raw, format) {
-    const v = (raw || '').toString().trim();
-    if (!v) return null;
-    let m, day, month, year;
-    if (format === 'iso') {
-      m = v.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
-      if (m) { year = m[1]; month = m[2]; day = m[3]; }
-    } else if (format === 'mdy') {
-      m = v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);
-      if (m) { month = m[1]; day = m[2]; year = m[3]; }
-    } else {
-      m = v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);
-      if (m) { day = m[1]; month = m[2]; year = m[3]; }
-    }
-    if (!day || !month || !year) return null;
-    day = day.padStart(2, '0');
-    month = month.padStart(2, '0');
-    const dayNum = parseInt(day, 10), monthNum = parseInt(month, 10), yearNum = parseInt(year, 10);
-    if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) return null;
-
-    // Reject impossible calendar dates (e.g. 31 February) rather than silently accepting them
-    const check = new Date(Date.UTC(yearNum, monthNum - 1, dayNum));
-    if (check.getUTCFullYear() !== yearNum || check.getUTCMonth() !== monthNum - 1 || check.getUTCDate() !== dayNum) {
-      return null;
-    }
-
-    return day + month + year;
-  }
-
-  function buildSlk581(surname, given, dobRaw, genderRaw, dobFormat) {
-    const hasSurname = (surname || '').toString().replace(/[^A-Za-z]/g, '').length > 0;
-    const surnameChars = hasSurname
-      ? extractLetters(surname, [2, 3, 5]).map(c => c || '2')
-      : null;
-
-    const hasGiven = (given || '').toString().replace(/[^A-Za-z]/g, '').length > 0;
-    const givenChars = hasGiven
-      ? extractLetters(given, [2, 3]).map(c => c || '2')
-      : null;
-
-    const dobStr = parseDob(dobRaw, dobFormat);
-    const genderChar = normaliseGender(genderRaw);
-
-    if (!surnameChars || !givenChars || !dobStr) return null;
-    return surnameChars.join('') + givenChars.join('') + dobStr + genderChar;
-  }
+  const workerBlob = new Blob([workerSource], { type: 'application/javascript' });
+  const worker = new Worker(URL.createObjectURL(workerBlob));
 
   // ---------------------------------------------------------------
   // State
   // ---------------------------------------------------------------
-  let csvRows = [];   // full parsed data, including header row at index 0
   let headers = [];
+  let lastCsvText = null;   // set once generation completes, used by Save
+  let lastFileName = 'output.csv';
 
   // ---------------------------------------------------------------
   // Elements
@@ -462,6 +542,8 @@
 
   const panelGenerate = document.getElementById('panelGenerate');
   const generateBtn = document.getElementById('generateBtn');
+  const generateBtnText = document.getElementById('generateBtnText');
+  const generateSpinner = document.getElementById('generateSpinner');
   const resultsArea = document.getElementById('resultsArea');
   const statTotal = document.getElementById('statTotal');
   const statOk = document.getElementById('statOk');
@@ -469,8 +551,6 @@
   const resultTable = document.getElementById('resultTable');
   const resultCaption = document.getElementById('resultCaption');
   const downloadBtn = document.getElementById('downloadBtn');
-
-  let outputRows = null; // set once generation has run
 
   // ---------------------------------------------------------------
   // File handling
@@ -497,7 +577,7 @@
     panelMapping.dataset.disabled = 'true';
     panelGenerate.dataset.disabled = 'true';
     resultsArea.style.display = 'none';
-    outputRows = null;
+    lastCsvText = null;
   }
 
   function handleFile(file) {
@@ -509,44 +589,71 @@
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const rows = parseCsv(String(reader.result));
+    lastFileName = file.name;
+    showUploadMessage('Reading file…', 'success');
+    worker.postMessage({ type: 'parse', file: file });
+  }
 
-      if (rows.length < 2) {
-        showUploadMessage('This file needs a header row plus at least one data row.', 'error');
+  worker.onmessage = (e) => {
+    const msg = e.data;
+
+    if (msg.type === 'parsed') {
+      if (!msg.ok) {
+        if (msg.error && msg.error.startsWith('COLCOUNT:')) {
+          const colCount = msg.error.split(':')[1];
+          showUploadMessage(
+            `This file has ${colCount} column${colCount === '1' ? '' : 's'}. A minimum of 5 columns is required (Unique ID, First Name, Last Name, DOB, Gender).`,
+            'error'
+          );
+        } else {
+          showUploadMessage(msg.error, 'error');
+        }
         return;
       }
 
-      const colCount = rows[0].length;
-      if (colCount < 5) {
-        showUploadMessage(
-          `This file has ${colCount} column${colCount === 1 ? '' : 's'}. A minimum of 5 columns is required (Unique ID, First Name, Last Name, DOB, Gender).`,
-          'error'
-        );
-        return;
-      }
-
-      csvRows = rows;
-      headers = rows[0];
-
-      dropFilename.textContent = file.name;
+      headers = msg.headers;
+      dropFilename.textContent = lastFileName;
       dropFilename.style.display = 'block';
       dropInstruction.textContent = 'Click to choose a different file';
-      showUploadMessage(`Loaded ${rows.length - 1} data row${rows.length - 1 === 1 ? '' : 's'} across ${colCount} columns.`, 'success');
+      showUploadMessage(`Loaded ${msg.totalRows} data row${msg.totalRows === 1 ? '' : 's'} across ${msg.colCount} columns.`, 'success');
 
-      renderPreview();
+      renderTable(previewTable, headers, msg.previewRows, -1);
+      previewCaption.textContent = `Showing ${msg.previewRows.length} of ${msg.totalRows} data rows.`;
+
       populateMappingDropdowns();
       panelPreview.dataset.disabled = 'false';
       panelMapping.dataset.disabled = 'false';
       panelGenerate.dataset.disabled = 'false';
-    };
-    reader.onerror = () => showUploadMessage('Could not read that file — please try again.', 'error');
-    reader.readAsText(file);
-  }
+      return;
+    }
+
+    if (msg.type === 'progress') {
+      generateBtnText.textContent = `Generating… (${msg.processed.toLocaleString()} / ${msg.total.toLocaleString()})`;
+      return;
+    }
+
+    if (msg.type === 'generated') {
+      lastCsvText = msg.csvText;
+      generateBtn.disabled = false;
+      generateSpinner.hidden = true;
+      generateBtnText.textContent = 'Generate SLK-581 column';
+
+      statTotal.textContent = msg.total;
+      statOk.textContent = msg.okCount;
+      statFail.textContent = msg.failCount;
+
+      renderTable(resultTable, msg.headers, msg.previewRows, msg.headers.length - 1);
+      resultCaption.textContent = msg.failCount > 0
+        ? `${msg.failCount} row${msg.failCount === 1 ? '' : 's'} skipped — usually an unparseable or missing date of birth.`
+        : 'Every row generated successfully.';
+
+      resultsArea.style.display = 'block';
+      return;
+    }
+  };
 
   // ---------------------------------------------------------------
-  // Preview (first 5 data rows)
+  // Preview rendering
   // ---------------------------------------------------------------
   function renderTable(target, headerRow, dataRows, newColIndex) {
     let html = '<thead><tr>';
@@ -567,12 +674,6 @@
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
-
-  function renderPreview() {
-    const dataRows = csvRows.slice(1, 6);
-    renderTable(previewTable, headers, dataRows, -1);
-    previewCaption.textContent = `Showing ${dataRows.length} of ${csvRows.length - 1} data rows.`;
   }
 
   // ---------------------------------------------------------------
@@ -613,57 +714,46 @@
   }
 
   // ---------------------------------------------------------------
-  // Generate
+  // Generate (delegated to the worker)
   // ---------------------------------------------------------------
   generateBtn.addEventListener('click', () => {
     if (!validateMapping()) return;
-    const m = getMapping();
-    const format = dobFormat.value;
-
-    const uniqueIdHeader = headers[parseInt(m.uniqueId, 10)];
-    const newHeaders = [uniqueIdHeader, 'SLK-581'];
-    const newRows = [newHeaders];
-    let okCount = 0, failCount = 0;
-
-    for (let r = 1; r < csvRows.length; r++) {
-      const row = csvRows[r];
-      const key = buildSlk581(
-        row[m.lastName],
-        row[m.firstName],
-        row[m.dob],
-        row[m.gender],
-        format
-      );
-      if (key) okCount++; else failCount++;
-      newRows.push([row[m.uniqueId], key || '']);
-    }
-
-    outputRows = newRows;
-
-    statTotal.textContent = csvRows.length - 1;
-    statOk.textContent = okCount;
-    statFail.textContent = failCount;
-
-    const previewDataRows = newRows.slice(1, 6);
-    renderTable(resultTable, newHeaders, previewDataRows, newHeaders.length - 1);
-    resultCaption.textContent = failCount > 0
-      ? `${failCount} row${failCount === 1 ? '' : 's'} skipped — usually an unparseable or missing date of birth.`
-      : 'Every row generated successfully.';
-
-    resultsArea.style.display = 'block';
+    generateBtn.disabled = true;
+    generateSpinner.hidden = false;
+    generateBtnText.textContent = 'Generating…';
+    worker.postMessage({ type: 'generate', mapping: getMapping(), dobFormat: dobFormat.value });
   });
 
   // ---------------------------------------------------------------
-  // Download
+  // Save — File System Access API where available, Blob download otherwise.
+  // Over file:// (true air-gapped use) showSaveFilePicker is unavailable,
+  // so this always falls through to the download method in that case.
   // ---------------------------------------------------------------
-  downloadBtn.addEventListener('click', () => {
-    if (!outputRows) return;
-    const csvText = serialiseCsv(outputRows);
-    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+  downloadBtn.addEventListener('click', async () => {
+    if (!lastCsvText) return;
+    const suggestedName = lastFileName.replace(/\.csv$/i, '') + '_slk581.csv';
+
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName,
+          types: [{ description: 'CSV file', accept: { 'text/csv': ['.csv'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(lastCsvText);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return; // user cancelled
+        // fall through to download fallback
+      }
+    }
+
+    const blob = new Blob([lastCsvText], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'slk581_output.csv';
+    a.download = suggestedName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

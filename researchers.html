@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Researchers — My Health Passport</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpath%20d%3D%22M11%208.5C11%207.12%2012.12%206%2013.5%206H31C32.66%206%2034%207.34%2034%209V38C34%2039.1%2033.1%2040%2032%2040H14.5C12.57%2040%2011%2038.43%2011%2036.5V8.5Z%22%20fill%3D%22%23fff%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M11%2034.5C11%2033.12%2012.12%2032%2013.5%2032H34V36.5C34%2038.43%2032.43%2040%2030.5%2040H13.5C12.12%2040%2011%2038.88%2011%2037.5V34.5Z%22%20fill%3D%22%231E2A27%22%20fill-opacity%3D%220.08%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M22.5%2012.5L29%2014.8V19.3C29%2023.3%2026.3%2026.4%2022.5%2027.6C18.7%2026.4%2016%2023.3%2016%2019.3V14.8L22.5%2012.5Z%22%20fill%3D%22%231B6E68%22/%3E%3Ccircle%20cx%3D%2222.5%22%20cy%3D%2218.1%22%20r%3D%222.1%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M19%2022.8C19%2020.7%2020.5%2019.6%2022.5%2019.6C24.5%2019.6%2026%2020.7%2026%2022.8%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EDF2F0;
+    --surface: #FBFCFB;
+    --ink: #1E2A27;
+    --muted: #5B6B67;
+    --line: #C6D1CD;
+    --line-soft: #DCE4E1;
+    --teal: #1B6E68;
+    --teal-dark: #144F4B;
+    --amber: #C07A22;
+    --amber-soft: #F2DFC0;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  a { color: var(--teal-dark); }
+
+  /* ---- Site header ---- */
+  .site-header { background: #FFFFFF; border-bottom: 1px solid var(--line-soft); }
+  .site-header-inner {
+    max-width: 1180px; margin: 0 auto; padding: 18px 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand-icon { width: 46px; height: 46px; flex: none; }
+  .brand-divider { width: 1px; height: 34px; background: var(--line); flex: none; }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-name { font-size: 17px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.15; text-transform: uppercase; }
+  .brand-name .line1 { color: var(--ink); display: block; }
+  .brand-name .line2 { color: var(--teal); display: block; }
+  .brand-tagline { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .header-badge {
+    margin-left: auto; font-size: 12px; font-weight: 700; color: var(--teal-dark);
+    background: var(--amber-soft); border: 1px solid var(--amber);
+    padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  @media (max-width: 620px) { .brand-tagline { display: none; } .site-header-inner { padding: 14px 16px; } }
+
+  /* ---- Page layout ---- */
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 20px 90px; }
+  .page-intro { max-width: 700px; margin-bottom: 8px; }
+  .section-eyebrow {
+    margin: 0 0 14px; color: var(--teal-dark); font-size: 13px; font-weight: 800;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .page-title { margin: 0; font-size: clamp(28px, 4.2vw, 36px); font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
+  .section-accent { width: 56px; height: 4px; margin: 20px 0; border-radius: 999px; background: var(--teal); }
+  .page-lede { margin: 0 0 16px; font-size: 15.5px; color: var(--ink); max-width: 68ch; line-height: 1.7; }
+  .page-lede.muted { color: var(--muted); }
+
+  /* ---- Section headers within the page ---- */
+  .section-block { margin-top: 64px; }
+  .section-block-head { max-width: 700px; margin-bottom: 24px; }
+  .section-block h2 {
+    font-size: 22px; font-weight: 800; color: var(--ink); margin: 0 0 8px; letter-spacing: -.005em;
+  }
+  .section-block p.section-desc { margin: 0; font-size: 14.5px; color: var(--muted); max-width: 66ch; }
+
+  /* ---- Tool cards ---- */
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .tool-grid { grid-template-columns: 1fr; } }
+
+  .tool-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 24px; display: flex; flex-direction: column;
+  }
+  .tool-card-icon {
+    width: 42px; height: 42px; border-radius: 50%; background: #EAF3F2;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+  }
+  .tool-card-icon svg { width: 20px; height: 20px; stroke: var(--teal-dark); }
+  .tool-card h3 { font-size: 16.5px; font-weight: 700; color: var(--ink); margin: 0 0 8px; }
+  .tool-card p { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 18px; flex: 1; }
+  .tool-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ---- Buttons ---- */
+  .cta-pill {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    background: var(--teal); color: #fff; font-family: inherit; font-weight: 700; font-size: 13.5px;
+    border: none; padding: 10px 18px; border-radius: 999px; cursor: pointer; text-decoration: none;
+  }
+  .cta-pill:hover { background: var(--teal-dark); }
+  .cta-pill svg { width: 14px; height: 14px; flex: none; }
+
+  .cta-pill.secondary { background: #fff; color: var(--teal-dark); border: 1.5px solid var(--teal); }
+  .cta-pill.secondary:hover { background: #EAF3F2; }
+
+  /* ---- Mind the Gap section ---- */
+  .gap-section {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 40px; text-align: center;
+  }
+  .gap-section .gap-symbol { width: 64px; height: 64px; display: block; margin: 0 auto 20px; }
+  .gap-section-intro { max-width: 620px; margin: 0 auto; text-align: left; }
+  .gap-section-intro p { font-size: 14.5px; line-height: 1.75; color: var(--ink); margin: 0 0 16px; }
+  .gap-section-intro p.lede { font-size: 16px; color: var(--muted); }
+  .gap-section-intro strong { color: var(--teal-dark); }
+  .gap-section-footer { text-align: center; margin-top: 24px; }
+
+  /* ---- Guide panel ---- */
+  .guide-panel {
+    background: var(--teal-dark); border-radius: 8px; padding: 32px 36px;
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    color: #fff;
+  }
+  .guide-panel-icon {
+    width: 48px; height: 48px; flex: none; border-radius: 50%; background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .guide-panel-icon svg { width: 22px; height: 22px; stroke: #fff; }
+  .guide-panel-text { flex: 1; min-width: 240px; }
+  .guide-panel-text h3 { margin: 0 0 6px; font-size: 17px; font-weight: 800; }
+  .guide-panel-text p { margin: 0; font-size: 13.5px; color: #CFE3E0; max-width: 56ch; }
+  .guide-panel .cta-pill { background: #fff; color: var(--teal-dark); flex: none; }
+  .guide-panel .cta-pill:hover { background: var(--amber-soft); }
+
+  footer.site-footer {
+    max-width: 880px; margin: 70px auto 0; padding: 24px 20px 0; border-top: 1px solid var(--line-soft);
+    font-size: 12.5px; color: var(--muted); text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 8.5C11 7.12 12.12 6 13.5 6H31C32.66 6 34 7.34 34 9V38C34 39.1 33.1 40 32 40H14.5C12.57 40 11 38.43 11 36.5V8.5Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M11 34.5C11 33.12 12.12 32 13.5 32H34V36.5C34 38.43 32.43 40 30.5 40H13.5C12.12 40 11 38.88 11 37.5V34.5Z" fill="var(--ink)" fill-opacity="0.06" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M22.5 13L28.5 15.1V19.3C28.5 23 26 25.9 22.5 27C19 25.9 16.5 23 16.5 19.3V15.1L22.5 13Z" fill="var(--teal)"/>
+        <circle cx="22.5" cy="18.3" r="1.9" fill="#fff"/>
+        <path d="M19.3 22.5C19.3 20.6 20.7 19.6 22.5 19.6C24.3 19.6 25.7 20.6 25.7 22.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-divider"></div>
+      <div class="brand-text">
+        <span class="brand-name"><span class="line1">My Health</span><span class="line2">Passport</span></span>
+        <span class="brand-tagline">Your health research identity. Your choice.</span>
+      </div>
+    </div>
+    <span class="header-badge">For Researchers</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <header class="page-intro">
+    <p class="section-eyebrow">For researchers</p>
+    <h1 class="page-title">Link your data without collecting identity</h1>
+    <div class="section-accent" aria-hidden="true"></div>
+    <p class="page-lede">My Health Passport gives research participants a way to generate a pseudonymised identifier — from their own name, date of birth, and sex — entirely on their own device, using the Statistical Linkage Key (SLK-581) standard developed by the Australian Institute of Health and Welfare (AIHW). No name, address, or other directly identifying field is ever collected or transmitted.</p>
+    <p class="page-lede">That identifier can be used two ways. Studies can work directly with the <strong style="color:var(--teal-dark)">SLK-581 key</strong> itself, or, where an extra layer of protection is preferred, convert it into a <strong style="color:var(--teal-dark)">SHA-256 cryptographic hash</strong> instead — a one-way transformation that cannot be reversed back into the original key. Either version lets you link a participant's data across surveys, contact points, and datasets over time, without ever asking them to create an account or share their name.</p>
+    <p class="page-lede muted">We provide a number of researcher tools to support this workflow — from building SLK-581 keys in bulk from an existing dataset, to generating participant-facing links for your surveys, to upgrading an existing database to store SHA-256 hashes automatically. Each is listed below, and can be opened directly or downloaded to run on your own device.</p>
+  </header>
+
+  <!-- ============ TOOLS ============ -->
+  <section class="section-block">
+    <div class="section-block-head">
+      <h2>Our researcher tools</h2>
+      <p class="section-desc">All four tools run entirely in your browser — nothing you enter is uploaded anywhere. Each can be opened directly below, or downloaded to keep and run offline.</p>
+    </div>
+
+    <div class="tool-grid">
+
+      <!-- Tool 1: URL Link Generator -->
+      <div class="tool-card">
+        <div class="tool-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        </div>
+        <h3>URL Link Generator Tool</h3>
+        <p>Build correctly-formatted portal links for your study — for an online survey, an SMS-based phone interview, or an email-based contact process — without hand-constructing query strings. Also generates a scannable QR code for printed materials.</p>
+        <div class="tool-card-actions">
+          <a href="link_gen.html" class="cta-pill" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Open tool
+          </a>
+          <a href="link_gen.html" class="cta-pill secondary" download="link_gen.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+      <!-- Tool 2: SLK-581 Generator -->
+      <div class="tool-card">
+        <div class="tool-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line></svg>
+        </div>
+        <h3>The SLK-581 Generator Tool</h3>
+        <p>Upload a CSV of existing records — name, date of birth, sex, and a unique ID — map the columns, and generate an SLK-581 linkage key for every row in bulk. Download the result as a new CSV with the key appended.</p>
+        <div class="tool-card-actions">
+          <a href="csv-batch-generator.html" class="cta-pill" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Open tool
+          </a>
+          <a href="csv-batch-generator.html" class="cta-pill secondary" download="csv-batch-generator.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+      <!-- Tool 3: SHA-256 Hashing Tool -->
+      <div class="tool-card">
+        <div class="tool-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <h3>The SHA-256 Hashing Tool</h3>
+        <p>Convert an existing set of SLK-581 keys into one-way SHA-256 hashes in bulk. Upload a single-column CSV of keys and produce a linkage table pairing each original key with its Barcode, ready to join against your SLK-581-enabled datasets.</p>
+        <div class="tool-card-actions">
+          <a href="csv-barcode-tool.html" class="cta-pill" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Open tool
+          </a>
+          <a href="csv-barcode-tool.html" class="cta-pill secondary" download="csv-barcode-tool.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+      <!-- Tool 4: SQL coding tool -->
+      <div class="tool-card">
+        <div class="tool-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+        </div>
+        <h3>SQL Coding Tool for Established Databases</h3>
+        <p>Ready-to-copy SQL for database administrators: add a SHA-256 column to an existing SLK-581-enabled database in PostgreSQL, MySQL/MariaDB, or SQL Server — backfilling every row and keeping future writes in sync automatically.</p>
+        <div class="tool-card-actions">
+          <a href="research-upgradingDB.html" class="cta-pill" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Open tool
+          </a>
+          <a href="research-upgradingDB.html" class="cta-pill secondary" download="research-upgradingDB.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ MIND THE GAP ============ -->
+  <section class="section-block">
+    <div class="section-block-head">
+      <h2>Built for air-gapped use</h2>
+      <p class="section-desc">Every tool above is designed around the same principle — look out for the Mind the Gap symbol.</p>
+    </div>
+
+    <div class="gap-section">
+      <svg class="gap-symbol" viewBox="230 45 250 250" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="355" cy="170" r="125" fill="#ffffff" stroke="#1E2A27" stroke-width="3"/>
+        <line x1="280" y1="245" x2="320" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+        <line x1="320" y1="205" x2="320" y2="95" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+        <line x1="320" y1="205" x2="430" y2="205" stroke="#1B6E68" stroke-width="1.2" stroke-opacity="0.4"/>
+        <polygon points="280,135 390,135 430,95 320,95" fill="#1B6E68" fill-opacity="0.22" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+        <polygon points="390,135 390,245 430,205 430,95" fill="#1B6E68" fill-opacity="0.28" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+        <polygon points="280,135 390,135 390,245 280,245" fill="#1B6E68" fill-opacity="0.14" stroke="#1B6E68" stroke-width="2" stroke-opacity="0.55" stroke-linejoin="round"/>
+        <polygon points="325,155 370,155 386,139 341,139" fill="#1B6E68" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+        <polygon points="370,155 370,200 386,184 386,139" fill="#0F3A36" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+        <polygon points="325,155 370,155 370,200 325,200" fill="#144F4B" stroke="#0B2C29" stroke-width="1.2" stroke-linejoin="round"/>
+      </svg>
+
+      <div class="gap-section-intro">
+        <p class="lede">Spy agencies protect their most sensitive work inside a SCIF — a Sensitive Compartmented Information Facility. It is, quite literally, a room within a room: a space physically isolated from the networks and signals surrounding it.</p>
+        <p>Many of our tools are built around the same principle, translated into software. Once downloaded onto a computer, they are ready to perform in similarly isolated, air-gapped conditions — running entirely on their own, with <strong>no ongoing connection to the internet required</strong>.</p>
+        <p>The tool itself becomes the sealed room. Everything it needs to operate travels with it, and nothing it processes has to leave. That is the gap worth minding — the space between a tool that merely claims to protect your data, and one that was never wired to transmit it in the first place.</p>
+        <p>Look out for the Mind the Gap symbol on our tool pages. It marks where you can find out more about how that tool performs within air-gapped data facilities, such as Trusted Research Environments (TREs) and Trusted Data Environments (TDEs).</p>
+      </div>
+
+      <div class="gap-section-footer">
+        <a href="mind-the-gap.html" class="cta-pill secondary" target="_blank" rel="noopener noreferrer">Read more about Mind the Gap</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TECHNICAL GUIDE ============ -->
+  <section class="section-block">
+    <div class="guide-panel">
+      <div class="guide-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </div>
+      <div class="guide-panel-text">
+        <h3>Technical Manual</h3>
+        <p>The full technical reference — system architecture, SLK-581 and SHA-256 briefings, survey platform setup, and the HREC ethics statement template.</p>
+      </div>
+      <a href="guide.pdf" class="cta-pill" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Read the Technical Guide
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  Your health research identity. <strong style="color:var(--teal);">Your choice.</strong><br>
+  © My Health Passport
+</footer>
+
+</body>
+</html>
