@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Health Passport</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://hqyvrfftoajdhkccvqam.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%0A%3Cpath%20d%3D%22M11%208.5C11%207.12%2012.12%206%2013.5%206H31C32.66%206%2034%207.34%2034%209V38C34%2039.1%2033.1%2040%2032%2040H14.5C12.57%2040%2011%2038.43%2011%2036.5V8.5Z%22%20fill%3D%22%23fff%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M11%2034.5C11%2033.12%2012.12%2032%2013.5%2032H34V36.5C34%2038.43%2032.43%2040%2030.5%2040H13.5C12.12%2040%2011%2038.88%2011%2037.5V34.5Z%22%20fill%3D%22%231E2A27%22%20fill-opacity%3D%220.08%22%20stroke%3D%22%231E2A27%22%20stroke-width%3D%222.6%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M22.5%2012.5L29%2014.8V19.3C29%2023.3%2026.3%2026.4%2022.5%2027.6C18.7%2026.4%2016%2023.3%2016%2019.3V14.8L22.5%2012.5Z%22%20fill%3D%22%231B6E68%22/%3E%0A%3Ccircle%20cx%3D%2222.5%22%20cy%3D%2218.1%22%20r%3D%222.1%22%20fill%3D%22%23fff%22/%3E%0A%3Cpath%20d%3D%22M19%2022.8C19%2020.7%2020.5%2019.6%2022.5%2019.6C24.5%2019.6%2026%2020.7%2026%2022.8%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22/%3E%0A%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -120,6 +121,24 @@
     flex: none;
   }
 
+  .header-badge-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    background: var(--amber-soft);
+    border: 1px solid var(--amber);
+    padding: 7px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    white-space: nowrap;
+    flex: none;
+  }
+  .header-badge-link:hover { background: #ecd6ae; }
+  .header-badge-link svg { width: 14px; height: 14px; flex: none; }
+
   .cta-pill {
     display: inline-flex;
     align-items: center;
@@ -138,11 +157,13 @@
 
   @media (max-width: 900px) {
     .site-nav { display: none; }
+    .header-badge-link { margin-left: auto; }
   }
   @media (max-width: 620px) {
     .brand-tagline { display: none; }
     .site-header-inner { padding: 14px 16px; }
     .cta-pill span.full { display: none; }
+    .header-badge-link span.full { display: none; }
   }
 
   .layout {
@@ -1362,6 +1383,11 @@
       <a href="#resources">Resources</a>
     </nav>
 
+    <a class="header-badge-link" href="researchers.html" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V11"></path><path d="M15 2h7v7"></path><line x1="9" y1="15" x2="22" y2="2"></line></svg>
+      <span class="full">Research Tools</span>
+    </a>
+
     <a class="cta-pill" href="#builder">
       <span class="full">Create your Passport</span>
       <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1898,7 +1924,7 @@ Sources:
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha384-PASTE_YOUR_GENERATED_HASH_HERE" crossorigin="anonymous"></script>
 <script>
 (function(){
   const surnameInput = document.getElementById('surname');
